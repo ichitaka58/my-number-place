@@ -7,6 +7,8 @@ import {
   TableContainer,
   TableRow,
 } from "@mui/material";
+import { blue, lightBlue } from "@mui/material/colors";
+import { alpha } from "@mui/material/styles";
 
 function App() {
   /**
@@ -24,29 +26,10 @@ function App() {
   const matrix: number[][] = Array.from({ length: 9 }, () =>
     Array.from({ length: 9 }, () => 0),
   );
-  // const [matrix, setMatrix] = useState<number[][]>(defaultMatrix);
   const [newMatrix, setNewMatrix] = useState<number[][]>(matrix);
-  // const [count, setCount] = useState<number>(0);
-
-  /**
-   * i行j列の値をnumに更新する関数
-   * @param i
-   * @param j
-   * @param num
-   */
-  // const updateMatix = (i: number, j: number, num: number) => {
-  //   setMatrix((prev) =>
-  //     prev.map((row, rowIndex) =>
-  //       rowIndex === i
-  //         ? row.map((cell, cellIndex) => (cellIndex === j ? num : cell))
-  //         : row,
-  //     ),
-  //   );
-  // };
 
   const generateArray = () => {
-    // setMatrix(defaultMatrix);
-    // console.log(matrix);
+
     const blockA: number[] = Array.from({ length: 9 }, () => 0);
     const blockB: number[] = Array.from({ length: 9 }, () => 0);
     const blockC: number[] = Array.from({ length: 9 }, () => 0);
@@ -59,21 +42,13 @@ function App() {
 
     for (let i = 0; i < 9; i++) {
       let count = 0;
-      // setCount(0);
       do {
         let rowNumbers = shuffleArray([...numbers]);
         // i行目を一旦0でリセットする
         matrix[i].fill(0);
-        // setMatrix((prev) =>
-        //   prev.map((row, rowIndex) =>
-        //     // rowIndex === i ? [0, 0, 0, 0, 0, 0, 0, 0, 0] : row,
-        //     rowIndex === i ? row.fill(0) : row,
-        //   ),
-        // );
-        // console.log(rowNumbers);
+
         for (let j = 0; j < 9; j++) {
           const column: number[] = matrix.map((row) => row[j]);
-          // console.log(column);
           if (i < 3 && j < 3) {
             blockA[3 * i + j] = 0;
             const num =
@@ -81,7 +56,6 @@ function App() {
                 (n) => !column.includes(n) && !blockA.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockA[3 * i + j] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 3 && j < 6) {
@@ -91,7 +65,6 @@ function App() {
                 (n) => !column.includes(n) && !blockB.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockB[3 * i + j - 3] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 3 && j < 9) {
@@ -101,7 +74,6 @@ function App() {
                 (n) => !column.includes(n) && !blockC.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockC[i * 3 + j - 6] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 6 && j < 3) {
@@ -111,7 +83,6 @@ function App() {
                 (n) => !column.includes(n) && !blockD.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockD[(i - 3) * 3 + j] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 6 && j < 6) {
@@ -121,7 +92,6 @@ function App() {
                 (n) => !column.includes(n) && !blockE.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockE[(i - 3) * 3 + j - 3] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 6 && j < 9) {
@@ -131,7 +101,6 @@ function App() {
                 (n) => !column.includes(n) && !blockF.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockF[(i - 3) * 3 + j - 6] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 9 && j < 3) {
@@ -141,7 +110,6 @@ function App() {
                 (n) => !column.includes(n) && !blockG.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockG[(i - 6) * 3 + j] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 9 && j < 6) {
@@ -151,7 +119,6 @@ function App() {
                 (n) => !column.includes(n) && !blockH.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockH[(i - 6) * 3 + j - 3] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else if (i < 9 && j < 9) {
@@ -161,7 +128,6 @@ function App() {
                 (n) => !column.includes(n) && !blockI.includes(n),
               ) || 0;
             matrix[i][j] = num;
-            // updateMatix(i, j, num);
             blockI[(i - 6) * 3 + j - 6] = num;
             rowNumbers = rowNumbers.filter((n) => n !== num);
           } else {
@@ -179,9 +145,7 @@ function App() {
     if (hasZero) console.error("配列に0が混じっています");
     console.log(matrix);
 
-    // return matrix;
     setNewMatrix(matrix);
-    // setMatrix(matrix);
   };
 
   return (
@@ -192,12 +156,12 @@ function App() {
           onClick={generateArray}
           className="bg-gray-300 border px-4 rounded-lg mb-4 hover:cursor-pointer hover:bg-gray-400"
         >
-          Text
+          生成
         </button>
-        <div className="size-124">
+        <div className="size-120">
           <TableContainer>
             <Table>
-              <TableBody sx={{ border: 2, bgcolor: "grey.100" }}>
+              <TableBody sx={{ border: 2, bgcolor: alpha(blue[500], 0.2) }}>
                 {newMatrix.map((row, rowIndex) => (
                   <TableRow key={rowIndex}>
                     {row.map((cell, cellIndex) => (
@@ -205,6 +169,7 @@ function App() {
                         key={cellIndex}
                         align="center"
                         sx={{
+                          fontWeight: "bold",
                           borderBottom: 2,
                           borderBottomColor:
                             rowIndex % 3 === 2 ? "black" : "grey.400",
