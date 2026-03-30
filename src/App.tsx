@@ -1,5 +1,12 @@
 import { useState } from "react";
 import "./App.css";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from "@mui/material";
 
 function App() {
   /**
@@ -187,16 +194,33 @@ function App() {
         >
           Text
         </button>
-        <div className="size-120 bg-blue-200">
-          <div className="grid grid-rows-9">
-            {newMatrix.map((row, index) => (
-              <div key={index} className="grid grid-cols-9">
-                {row.map((col, index) => (
-                  <div key={index}>{col}</div>
+        <div className="size-124">
+          <TableContainer>
+            <Table>
+              <TableBody sx={{ border: 2, bgcolor: "grey.100" }}>
+                {newMatrix.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <TableCell
+                        key={cellIndex}
+                        align="center"
+                        sx={{
+                          borderBottom: 2,
+                          borderBottomColor:
+                            rowIndex % 3 === 2 ? "black" : "grey.400",
+                          borderRight: 2,
+                          borderRightColor:
+                            cellIndex % 3 === 2 ? "black" : "grey.400",
+                        }}
+                      >
+                        {cell}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </div>
-            ))}
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       </div>
     </>
