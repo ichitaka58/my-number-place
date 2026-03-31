@@ -104,6 +104,82 @@ const generateNumberPlace = (): number[][] => {
 };
 
 /**
+ * 与えられた盤面の解の数を計算するバックトラッキング関数。
+ * 解が唯一か複数かを判定するため、解が2つ見つかった時点で探索を打ち切る。
+ *
+ * @param {number[][]} grid - 現在の数独盤面
+ * @param {number} pos - 現在確認しているマスのインデックス (0-80)
+ * @param {{ value: number }} count - 解の数を保持する参照用オブジェクト
+ * @returns {number} 盤面の解の数（最大2）
+ */
+const countSolutions = (grid: number[][], pos: number = 0, count = { value: 0 }): number => {
+  // 81マスすべてを埋め終わった場合、解が1つ見つかったとしてカウント
+  if(pos === 81) {
+    count.value++;
+    return count.value;
+  }
+  const row = Math.floor(pos / 9);
+  const col = pos % 9;
+  
+  // すでに数字が入っているマスはスキップして次のマスへ
+  if(grid[row][col] !== 0) {
+    return countSolutions(grid, pos + 1, count);
+  }
+
+  // 空白マスに対して1〜9の数字を順に試す
+  for(let num = 1; num <= 9; num++) {
+    // 処理の最適化のため、すでに2つの解が見つかっている場合は探索を打ち切る
+    if(count.value >= 2) break;
+    
+    if(isValid(grid, row, col, num)) {
+      grid[row][col] = num; // 数字を仮置き
+      countSolutions(grid, pos + 1, count); // 次のマスを再帰的に探索
+      grid[row][col] = 0; // バックトラック（元に戻して次の数字を試す）
+    }
+  }
+  return count.value;
+}
+
+/**
+ * 問題生成：完成盤面からマスを消していく
+ * 問題として成立するため、解が必ず1つ（一意）になるようにマスを削除する。
+ *
+ * @param {number[][]} solvedGrid - 完成した9x9の数独盤面
+ * @param {number} blanks - 消すマスの最大値 (デフォルト: 40)
+ * @returns {number[][]} 生成された数独問題
+ */
+const generatePuzzle = (solvedGrid: number[][], blanks: number = 40): number[][] => {
+  // 元の盤面に影響を与えないよう、新しく盤面をコピー
+  const grid = solvedGrid.map(row => [...row]);
+  // どの順番でマスを消していくかをランダムにするため、0〜80の位置番号をシャッフル
+  const positions = shuffled(Array.from({ length: 81 }, (_, i) => i));
+  let removed = 0; // 実際に空白にしたマスの数
+
+  for(const pos of positions) {
+    if(removed >= blanks) break; // 指定した数のマスを消し終わったら終了
+
+    const row = Math.floor( pos / 9);
+    const col = pos % 9;
+    
+    // 消すマスの数字を後で戻せるように一時退避
+    const backup = grid[row][col]; 
+    grid[row][col] = 0; // マスを空白(0)にする
+
+    // そのマスを空白にした盤面のコピーを探索に渡し、解がいくつあるか調べる
+    if(countSolutions(grid.map(r => [...r])) === 1) {
+      // 解が1つの場合（問題が成立する）、そのまま空白にして消した数をカウントアップ
+      removed++;
+    }else{
+      // 解が2つ以上になる場合、一意な解答にならなくなるため数字を元に戻す
+      grid[row][col] = backup;
+    }
+  }
+  // 実際に消すことができたマスの数を出力（開発用）
+  console.log(removed);
+  return grid;
+}
+
+/**
  * ナンバープレース（数独）のメイン・アプリケーションコンポーネント
  */
 function App() {
@@ -114,7 +190,8 @@ function App() {
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
   const handleGenerate = () => {
     const newGrid = generateNumberPlace();
-    setMatrix(newGrid);
+    const puzzle = generatePuzzle(newGrid,60);
+    setMatrix(puzzle);
   };
 
   return (
@@ -138,7 +215,10 @@ function App() {
                         key={cellIndex}
                         align="center"
                         sx={{
+                          fontSize: "1.5rem",
                           fontWeight: "bold",
+                          px: "12px",
+                          py: "8px",
                           borderBottom: 2,
                           // 3x3ブロックの水平方向の境界線を強調表示
                           borderBottomColor:
@@ -150,7 +230,7 @@ function App() {
                         }}
                       >
                         {cell || "\u00A0"}
-                      </TableCell>
+                      </TableCell> // cell || "\u00A0" で、0のときに &nbsp;（ノーブレークスペース）を表示
                     ))}
                   </TableRow>
                 ))}
