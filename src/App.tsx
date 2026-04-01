@@ -1,13 +1,15 @@
 import { useState } from "react";
 import "./App.css";
 import {
+  Button,
+  ButtonGroup,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableRow,
 } from "@mui/material";
-import { blue } from "@mui/material/colors";
+import { blue, yellow } from "@mui/material/colors";
 import { alpha } from "@mui/material/styles";
 
 /** 定数はコンポーネント外に置き、毎レンダリングの再生成を避ける */
@@ -185,6 +187,8 @@ const generatePuzzle = (solvedGrid: number[][], blanks: number = 40): number[][]
 function App() {
   // 数独の盤面状態を管理するステート（初期状態は空のグリッド）
   const [matrix, setMatrix] = useState<number[][]>(createEmptyGrid());
+  const [selected, setSelected] = useState<boolean>(false);
+  const [selectedCell, setSelectedCell] = useState<number[]>([]);
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
@@ -212,6 +216,10 @@ function App() {
                   <TableRow key={rowIndex}>
                     {row.map((cell, cellIndex) => (
                       <TableCell
+                        onClick={() => {
+                          setSelected(!selected)
+                          setSelectedCell([rowIndex, cellIndex])
+                        }}
                         key={cellIndex}
                         align="center"
                         sx={{
@@ -227,6 +235,7 @@ function App() {
                           // 3x3ブロックの垂直方向の境界線を強調表示
                           borderRightColor:
                             cellIndex % 3 === 2 ? "black" : "grey.400",
+                          bgcolor: selectedCell[0] === rowIndex && selectedCell[1] === cellIndex ? alpha(yellow[200], 0.5) : "inherit",
                         }}
                       >
                         {cell || "\u00A0"}
@@ -237,6 +246,19 @@ function App() {
               </TableBody>
             </Table>
           </TableContainer>
+        </div>
+        <div className="w-120 text-center">
+          <ButtonGroup variant="outlined" color="inherit" fullWidth>
+            <Button>1</Button>
+            <Button>2</Button>
+            <Button>3</Button>
+            <Button>4</Button>
+            <Button>5</Button>
+            <Button>6</Button>
+            <Button>7</Button>
+            <Button>8</Button>
+            <Button>9</Button>
+          </ButtonGroup>
         </div>
       </div>
     </>
