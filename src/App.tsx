@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import {
   Button,
@@ -9,7 +9,7 @@ import {
   TableContainer,
   TableRow,
 } from "@mui/material";
-import { blue, yellow } from "@mui/material/colors";
+import { blue, red, yellow } from "@mui/material/colors";
 import { alpha } from "@mui/material/styles";
 
 /** 定数はコンポーネント外に置き、毎レンダリングの再生成を避ける */
@@ -186,16 +186,20 @@ const generatePuzzle = (solvedGrid: number[][], blanks: number = 40): number[][]
  * ナンバープレース（数独）のメイン・アプリケーションコンポーネント
  */
 function App() {
-  // 数独の盤面状態を管理するステート（初期状態は空のグリッド）
+  // 数独の現在の盤面状態を管理するステート（初期状態は空のグリッド）
   const [matrix, setMatrix] = useState<number[][]>(createEmptyGrid());
-  const [selected, setSelected] = useState<boolean>(false);
+  // 初期盤面の状態（初期配置された固定の数字）を保持するステート
+  const [initialBoard, setInitialBoard] = useState<number[][]>(createEmptyGrid());
+  // 現在選択されているセルの座標 [行インデックス, 列インデックス] を保持するステート
   const [selectedCell, setSelectedCell] = useState<number[]>([]);
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
   const handleGenerate = () => {
+    setSelectedCell([]);
     const newGrid = generateNumberPlace();
     const puzzle = generatePuzzle(newGrid, 60);
+    setInitialBoard(puzzle.map(row => [...row]));
     setMatrix(puzzle);
   };
 
@@ -212,6 +216,23 @@ function App() {
       setMatrix(newMatrix);
     }
   }
+
+  /**
+   * 置いた数字を消す処理
+   * 選択中のセルが存在する場合、そのセルの値を 0（空白）に戻す
+   */
+  const onClickCancelButton = () => {
+    if (selectedCell.length === 2) {
+      const newMatrix = matrix.map(row => [...row]);
+      newMatrix[selectedCell[0]][selectedCell[1]] = 0;
+      setMatrix(newMatrix);
+    }
+  }
+
+  // コンポーネントの初回マウント時に一度だけ盤面を自動生成する
+  useEffect(() => {
+    handleGenerate();
+  }, [])
 
   return (
     <>
@@ -252,8 +273,8 @@ function App() {
                             cellIndex % 3 === 2 ? "black" : "grey.400",
                           // 選択中のセルの背景色
                           bgcolor: selectedCell[0] === rowIndex && selectedCell[1] === cellIndex ? alpha(yellow[200], 0.5) : "inherit",
-                          // 盤面の数字が0でない場合は、ポインターイベントを無効にする
-                          ...(matrix[rowIndex][cellIndex] !== 0 && { pointerEvents: "none" }),
+                          // 初期盤面の数字が0でない場合は、ポインターイベントを無効にする
+                          ...(initialBoard[rowIndex][cellIndex] !== 0 && { pointerEvents: "none", color: "grey.800", bgcolor: alpha(blue[200],0.5)}),
                         }}
                       >
                         {cell || "\u00A0"}
@@ -270,6 +291,7 @@ function App() {
             {NUMBERS.map((n) => (
               <Button key={n} onClick={onClickNumberButton}>{n}</Button>
             ))}
+            <Button onClick={onClickCancelButton} sx={{ fontSize: "0.6rem", bgcolor: alpha(red[200], 0.2) }}>CANCEL</Button>
           </ButtonGroup>
         </div>
       </div>
