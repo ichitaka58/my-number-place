@@ -3,6 +3,9 @@ import "./App.css";
 import {
   Button,
   ButtonGroup,
+  MenuItem,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -143,6 +146,27 @@ const countSolutions = (grid: number[][], pos: number = 0, count = { value: 0 })
 }
 
 /**
+ * 問題の難易度レベルに応じて、盤面から削るマスの数を決定する関数
+ * "easy": 40〜49マスの空白
+ * "medium": 50〜54マスの空白
+ * "hard": 固定で最大60マスの空白
+ *
+ * @param {"easy" | "medium" | "hard"} level - 選択された難易度
+ * @returns {number} 消去するマスの数
+ */
+const selectLevel = (level: "easy" | "medium" | "hard"): number => {
+  switch (level) {
+    case "easy":
+      return Math.floor(Math.random() * 10) + 40;
+    case "medium":
+      return Math.floor(Math.random() * 5) + 50;
+    case "hard":
+      return 60;
+  }
+}
+
+
+/**
  * 問題生成：完成盤面からマスを消していく
  * 問題として成立するため、解が必ず1つ（一意）になるようにマスを削除する。
  *
@@ -192,13 +216,18 @@ function App() {
   const [initialBoard, setInitialBoard] = useState<number[][]>(createEmptyGrid());
   // 現在選択されているセルの座標 [行インデックス, 列インデックス] を保持するステート
   const [selectedCell, setSelectedCell] = useState<number[]>([]);
+  // 選択された難易度レベル（"easy" | "medium" | "hard"）を保持するステート
+  const [level, setLevel] = useState<"easy" | "medium" | "hard">("easy");
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
   const handleGenerate = () => {
     setSelectedCell([]);
+    const blanks = selectLevel(level);
+    console.log(level);
+    console.log(blanks);
     const newGrid = generateNumberPlace();
-    const puzzle = generatePuzzle(newGrid, 60);
+    const puzzle = generatePuzzle(newGrid, blanks);
     setInitialBoard(puzzle.map(row => [...row]));
     setMatrix(puzzle);
   };
@@ -238,13 +267,20 @@ function App() {
     <>
       <div className="flex flex-col justify-center items-center min-h-screen max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold mb-4">My Number Place</h1>
-        <button
-          onClick={handleGenerate}
-          className="bg-gray-300 border px-4 rounded-lg mb-4 hover:cursor-pointer hover:bg-gray-400"
-        >
-          生成
-        </button>
-        <div className="size-120">
+        <Stack direction="row" spacing={2}>
+          <Button
+            onClick={handleGenerate}
+            variant="contained"
+          >
+            問題生成
+          </Button>
+          <Select size="small" value={level} defaultValue="easy" onChange={(e) => setLevel(e.target.value as "easy" | "medium" | "hard")}>
+            <MenuItem value="easy">Easy</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="hard">Hard</MenuItem>
+          </Select>
+        </Stack>
+        <div className="size-120 mt-4">
           <TableContainer>
             <Table>
               <TableBody sx={{ border: 2, bgcolor: alpha(blue[500], 0.2) }}>
@@ -274,7 +310,7 @@ function App() {
                           // 選択中のセルの背景色
                           bgcolor: selectedCell[0] === rowIndex && selectedCell[1] === cellIndex ? alpha(yellow[200], 0.5) : "inherit",
                           // 初期盤面の数字が0でない場合は、ポインターイベントを無効にする
-                          ...(initialBoard[rowIndex][cellIndex] !== 0 && { pointerEvents: "none", color: "grey.800", bgcolor: alpha(blue[200],0.5)}),
+                          ...(initialBoard[rowIndex][cellIndex] !== 0 && { pointerEvents: "none", color: "grey.800", bgcolor: alpha(blue[200], 0.5) }),
                         }}
                       >
                         {cell || "\u00A0"}
