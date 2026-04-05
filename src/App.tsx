@@ -157,7 +157,7 @@ const countSolutions = (grid: number[][], pos: number = 0, count = { value: 0 })
 const selectLevel = (level: "easy" | "medium" | "hard"): number => {
   switch (level) {
     case "easy":
-      return Math.floor(Math.random() * 10) + 40;
+      return Math.floor(Math.random() * 10);
     case "medium":
       return Math.floor(Math.random() * 5) + 50;
     case "hard":
@@ -204,6 +204,19 @@ const generatePuzzle = (solvedGrid: number[][], blanks: number = 40): number[][]
   return grid;
 }
 
+/**
+ * 2つの数独盤面が等しいかどうかを判定する
+ * @param grid1 1つ目の数独盤面
+ * @param grid2 2つ目の数独盤面
+ * @returns 2つの盤面が等しい場合は true、そうでない場合は false
+ */
+const areGridsEqual = (grid1: number[][], grid2: number[][]): boolean => {
+  if (grid1.length !== grid2.length) return false;
+  return grid1.every((row, i) => {
+    if (row.length !== grid2[i].length) return false;
+    return row.every((cell, j) => cell === grid2[i][j]);
+  });
+}
 
 
 /**
@@ -218,16 +231,22 @@ function App() {
   const [selectedCell, setSelectedCell] = useState<number[]>([]);
   // 選択された難易度レベル（"easy" | "medium" | "hard"）を保持するステート
   const [level, setLevel] = useState<"easy" | "medium" | "hard">("easy");
+  // 完成盤面を保持するステート
+  const [solvedBoard, setSolvedBoard] = useState<number[][]>(createEmptyGrid());
+  // 完成したかどうかを保持するステート
+  const [completed, setCompleted] = useState<boolean>(false);
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
   const handleGenerate = () => {
+    setCompleted(false);
     setSelectedCell([]);
     const blanks = selectLevel(level);
-    console.log(level);
-    console.log(blanks);
-    const newGrid = generateNumberPlace();
-    const puzzle = generatePuzzle(newGrid, blanks);
+    // console.log(level);
+    // console.log(blanks);
+    const solvedGrid = generateNumberPlace();
+    setSolvedBoard(solvedGrid.map(row => [...row]));
+    const puzzle = generatePuzzle(solvedGrid, blanks);
     setInitialBoard(puzzle.map(row => [...row]));
     setMatrix(puzzle);
   };
@@ -243,11 +262,15 @@ function App() {
       const newMatrix = matrix.map(row => [...row]);
       newMatrix[selectedCell[0]][selectedCell[1]] = value;
       setMatrix(newMatrix);
+      if (areGridsEqual(newMatrix, solvedBoard)) {
+        setCompleted(true);
+        // console.log("Puzzle is completed!");
+      }
     }
   }
 
   /**
-   * 置いた数字を消す処理
+   * 置いた数字をキャンセルする処理
    * 選択中のセルが存在する場合、そのセルの値を 0（空白）に戻す
    */
   const onClickCancelButton = () => {
@@ -280,7 +303,7 @@ function App() {
             <MenuItem value="hard">Hard</MenuItem>
           </Select>
         </Stack>
-        <div className="size-120 mt-4">
+        <div className="size-120 mt-4 relative">
           <TableContainer>
             <Table>
               <TableBody sx={{ border: 2, bgcolor: alpha(blue[500], 0.2) }}>
@@ -289,7 +312,6 @@ function App() {
                     {row.map((cell, cellIndex) => (
                       <TableCell
                         onClick={() => {
-                          // setSelected(!selected)
                           setSelectedCell([rowIndex, cellIndex])
                         }}
                         key={cellIndex}
@@ -311,6 +333,7 @@ function App() {
                           bgcolor: selectedCell[0] === rowIndex && selectedCell[1] === cellIndex ? alpha(yellow[200], 0.5) : "inherit",
                           // 初期盤面の数字が0でない場合は、ポインターイベントを無効にする
                           ...(initialBoard[rowIndex][cellIndex] !== 0 && { pointerEvents: "none", color: "grey.800", bgcolor: alpha(blue[200], 0.5) }),
+                          ...(completed && { pointerEvents: "none", color: "grey.600", bgcolor: "white"})
                         }}
                       >
                         {cell || "\u00A0"}
@@ -321,6 +344,7 @@ function App() {
               </TableBody>
             </Table>
           </TableContainer>
+          {completed && <p className="text-4xl font-bold text-green-600 text-shadow-lg bg-white p-4 rounded-xl absolute top-1/2 left-1/2 animate-slide-up">Completed!</p>}
         </div>
         <div className="w-120 text-center">
           <ButtonGroup variant="outlined" color="inherit" fullWidth>
