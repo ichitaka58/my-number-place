@@ -14,7 +14,6 @@ function useWindowSize() {
 }
 import {
   Button,
-  ButtonGroup,
   MenuItem,
   Select,
   Stack,
@@ -24,7 +23,7 @@ import {
   TableContainer,
   TableRow,
 } from "@mui/material";
-import { blue, red, yellow } from "@mui/material/colors";
+import { blue, yellow } from "@mui/material/colors";
 import { alpha } from "@mui/material/styles";
 import { useSudoku } from "./hooks/useSudoku";
 import { NUMBERS, type Level } from "./utils/sudokuLogic";
@@ -45,22 +44,30 @@ function App() {
     <>
       {completed && <Confetti width={windowWidth} height={windowHeight} recycle={false} numberOfPieces={500} />}
       <div className="flex flex-col justify-center items-center min-h-screen max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">My Number Place</h1>
-        <Stack direction="row" spacing={2}>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">My Number Place</h1>
+        <Stack direction="row" spacing={1.5} alignItems="center">
           <Button
             onClick={handleGenerate}
             variant="contained"
+            size="small"
+            sx={{ fontSize: "0.8rem", px: 1.5, py: 0.5, height: "32px" }}
           >
             問題生成
           </Button>
-          <Select size="small" value={level} defaultValue="easy" onChange={(e) => setLevel(e.target.value as Level)}>
-            <MenuItem value="easy">Easy</MenuItem>
-            <MenuItem value="medium">Medium</MenuItem>
-            <MenuItem value="hard">Hard</MenuItem>
-            <MenuItem value="debug">debug</MenuItem>
+          <Select 
+            size="small" 
+            value={level} 
+            defaultValue="easy" 
+            onChange={(e) => setLevel(e.target.value as Level)}
+            sx={{ fontSize: "0.8rem", height: "32px" }}
+          >
+            <MenuItem value="easy" sx={{ fontSize: "0.8rem" }}>Easy</MenuItem>
+            <MenuItem value="medium" sx={{ fontSize: "0.8rem" }}>Medium</MenuItem>
+            <MenuItem value="hard" sx={{ fontSize: "0.8rem" }}>Hard</MenuItem>
+            <MenuItem value="debug" sx={{ fontSize: "0.8rem" }}>debug</MenuItem>
           </Select>
         </Stack>
-        <div className="size-120 mt-4 relative">
+        <div className="w-full max-w-[480px] aspect-square mt-4 relative px-2 sm:px-0">
           <div className={`transition-all duration-700 ${completed ? "blur-sm grayscale-[50%]" : ""}`}>
             <TableContainer>
               <Table>
@@ -75,10 +82,10 @@ function App() {
                           key={cellIndex}
                           align="center"
                           sx={{
-                            fontSize: "1.5rem",
+                            fontSize: { xs: "1.1rem", sm: "1.5rem" },
                             fontWeight: "bold",
-                            px: "12px",
-                            py: "8px",
+                            px: { xs: "4px", sm: "12px" },
+                            py: { xs: "6px", sm: "8px" },
                             borderBottom: 2,
                             // 3x3ブロックの水平方向の境界線を強調表示
                             borderBottomColor:
@@ -103,15 +110,28 @@ function App() {
               </Table>
             </TableContainer>
           </div>
-          {completed && <p className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 drop-shadow-2xl bg-white/80 backdrop-blur-md px-8 py-6 rounded-2xl border-2 border-white/50 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap">🎉 Completed! 🎊</p>}
+          {completed && <p className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 drop-shadow-2xl bg-white/80 backdrop-blur-md px-4 py-4 md:px-8 md:py-6 rounded-2xl border-2 border-white/50 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap">🎉 Completed! 🎊</p>}
         </div>
-        <div className="w-120 text-center">
-          <ButtonGroup variant="outlined" color="inherit" fullWidth>
+        <div className="w-full max-w-[480px] mt-4 px-2 sm:px-0">
+          <div className="flex w-full overflow-hidden rounded border border-gray-400">
             {NUMBERS.map((n) => (
-              <Button key={n} onClick={onClickNumberButton} disabled={completed}>{n}</Button>
+              <button
+                key={n}
+                onClick={onClickNumberButton}
+                disabled={completed}
+                className="flex-[1] min-w-0 px-0 h-11 sm:h-12 text-[1.1rem] sm:text-[1.2rem] text-inherit border-r border-gray-400 enabled:hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-transparent cursor-pointer"
+              >
+                {n}
+              </button>
             ))}
-            <Button onClick={onClickCancelButton} sx={{ fontSize: "0.6rem", bgcolor: alpha(red[200], 0.2) }} disabled={completed}>CANCEL</Button>
-          </ButtonGroup>
+            <button
+              onClick={onClickCancelButton}
+              disabled={completed}
+              className="flex-[1.5] min-w-0 px-0 h-11 sm:h-12 text-[0.55rem] sm:text-[0.6rem] font-medium bg-red-200/20 enabled:hover:bg-red-200/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-inherit cursor-pointer"
+            >
+              CANCEL
+            </button>
+          </div>
         </div>
       </div>
     </>
