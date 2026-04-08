@@ -12,24 +12,12 @@ function useWindowSize() {
   }, []);
   return size;
 }
-import {
-  Button,
-  MenuItem,
-  Select,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from "@mui/material";
-import { blue, yellow } from "@mui/material/colors";
-import { alpha } from "@mui/material/styles";
+
 import { useSudoku } from "./hooks/useSudoku";
 import { NUMBERS, type Level } from "./utils/sudokuLogic";
 
 /**
- * ナンバープレース（数独）のメイン・アプリケーションコンポーネント
+ * ナンバープレース（数独）のメイン・アプリケーションコンポーネント (Sleek Dark Theme)
  */
 function App() {
   const { matrix, initialBoard, selectedCell, level, setLevel, setSelectedCell, completed, handleGenerate, onClickNumberButton, onClickCancelButton } = useSudoku();
@@ -38,105 +26,162 @@ function App() {
   // コンポーネントの初回マウント時に一度だけ盤面を自動生成する
   useEffect(() => {
     handleGenerate();
-  }, [])
+  }, []);
+
+  // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
+  const selectedRow = selectedCell[0];
+  const selectedCol = selectedCell[1];
+  const selectedValue = (selectedRow >= 0 && selectedCol >= 0) ? matrix[selectedRow]?.[selectedCol] ?? 0 : 0;
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-950 font-['Inter',_sans-serif] text-slate-100 flex flex-col items-center pt-8 pb-24 px-4 overflow-x-hidden">
       {completed && <Confetti width={windowWidth} height={windowHeight} recycle={false} numberOfPieces={500} />}
-      <div className="flex flex-col justify-center items-center min-h-screen max-w-3xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">My Number Place</h1>
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Button
-            onClick={handleGenerate}
-            variant="contained"
-            size="small"
-            sx={{ fontSize: "0.8rem", px: 1.5, py: 0.5, height: "32px" }}
-          >
-            問題生成
-          </Button>
-          <Select 
-            size="small" 
-            value={level} 
-            defaultValue="easy" 
+      
+      {/* Header Area */}
+      <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[480px] mb-6 gap-4 sm:gap-0">
+        <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.4)] whitespace-nowrap">
+          My Number Place
+        </h1>
+        <div className="flex gap-3 w-full sm:w-auto justify-center">
+          <select
+            value={level}
             onChange={(e) => setLevel(e.target.value as Level)}
-            sx={{ fontSize: "0.8rem", height: "32px" }}
+            className="bg-slate-800 border border-slate-700 text-slate-300 text-sm md:text-base rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 transition-shadow cursor-pointer appearance-none shadow-lg"
           >
-            <MenuItem value="easy" sx={{ fontSize: "0.8rem" }}>Easy</MenuItem>
-            <MenuItem value="medium" sx={{ fontSize: "0.8rem" }}>Medium</MenuItem>
-            <MenuItem value="hard" sx={{ fontSize: "0.8rem" }}>Hard</MenuItem>
-            <MenuItem value="debug" sx={{ fontSize: "0.8rem" }}>debug</MenuItem>
-          </Select>
-        </Stack>
-        <div className="w-full max-w-[480px] aspect-square mt-4 relative px-2 sm:px-0">
-          <div className={`transition-all duration-700 ${completed ? "blur-sm grayscale-[50%]" : ""}`}>
-            <TableContainer>
-              <Table>
-                <TableBody sx={{ border: 2, bgcolor: alpha(blue[500], 0.2) }}>
-                  {matrix.map((row, rowIndex) => (
-                    <TableRow key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <TableCell
-                          onClick={() => {
-                            setSelectedCell([rowIndex, cellIndex])
-                          }}
-                          key={cellIndex}
-                          align="center"
-                          sx={{
-                            fontSize: { xs: "1.1rem", sm: "1.5rem" },
-                            fontWeight: "bold",
-                            px: { xs: "4px", sm: "12px" },
-                            py: { xs: "6px", sm: "8px" },
-                            borderBottom: 2,
-                            // 3x3ブロックの水平方向の境界線を強調表示
-                            borderBottomColor:
-                              rowIndex % 3 === 2 ? "black" : "grey.400",
-                            borderRight: 2,
-                            // 3x3ブロックの垂直方向の境界線を強調表示
-                            borderRightColor:
-                              cellIndex % 3 === 2 ? "black" : "grey.400",
-                            // 選択中のセルの背景色
-                            bgcolor: selectedCell[0] === rowIndex && selectedCell[1] === cellIndex ? alpha(yellow[200], 0.5) : "inherit",
-                            // 初期盤面の数字が0でない場合は、ポインターイベントを無効にする
-                            ...(initialBoard[rowIndex][cellIndex] !== 0 && { pointerEvents: "none", color: "grey.800", bgcolor: alpha(blue[200], 0.5) }),
-                            ...(completed && { pointerEvents: "none", color: "grey.600", bgcolor: "white" })
-                          }}
-                        >
-                          {cell || "\u00A0"}
-                        </TableCell> // cell || "\u00A0" で、0のときに &nbsp;（ノーブレークスペース）を表示
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </div>
-          {completed && <p className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 drop-shadow-2xl bg-white/80 backdrop-blur-md px-4 py-4 md:px-8 md:py-6 rounded-2xl border-2 border-white/50 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap">🎉 Completed! 🎊</p>}
-        </div>
-        <div className="w-full max-w-[480px] mt-4 px-2 sm:px-0">
-          <div className="flex w-full overflow-hidden rounded border border-gray-400">
-            {NUMBERS.map((n) => (
-              <button
-                key={n}
-                onClick={onClickNumberButton}
-                disabled={completed}
-                className="flex-[1] min-w-0 px-0 h-11 sm:h-12 text-[1.1rem] sm:text-[1.2rem] text-inherit border-r border-gray-400 enabled:hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-transparent cursor-pointer"
-              >
-                {n}
-              </button>
-            ))}
-            <button
-              onClick={onClickCancelButton}
-              disabled={completed}
-              className="flex-[1.5] min-w-0 px-0 h-11 sm:h-12 text-[0.55rem] sm:text-[0.6rem] font-medium bg-red-200/20 enabled:hover:bg-red-200/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-inherit cursor-pointer"
-            >
-              CANCEL
-            </button>
-          </div>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="debug">Debug</option>
+          </select>
+          <button
+            onClick={handleGenerate}
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm md:text-base font-semibold py-2 px-4 rounded-lg shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 active:translate-y-0 transition-all"
+          >
+            New Game
+          </button>
         </div>
       </div>
-    </>
+
+      {/* Sudoku Grid Area */}
+      <div className="w-full max-w-[480px] aspect-square relative">
+        <div className={`w-full h-full grid grid-cols-9 bg-slate-900 border-2 border-cyan-400 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-700 ${completed ? "blur-sm grayscale-[50%]" : ""}`}>
+          {matrix.map((row, rowIndex) => (
+            row.map((cell, cellIndex) => {
+              // 状態の判定
+              const isSelected = selectedRow === rowIndex && selectedCol === cellIndex;
+              const isInitial = initialBoard[rowIndex][cellIndex] !== 0;
+              
+              // 同じ数字のハイライト
+              const isSameValue = cell !== 0 && selectedValue === cell && !isSelected;
+
+              // スタイリング用クラスの構築
+              let bgClass = "bg-slate-900";
+              if (completed) {
+                bgClass = "bg-slate-900";
+              } else if (isSelected) {
+                bgClass = "bg-blue-500/30 ring-2 ring-inset ring-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] z-10";
+              } else if (isSameValue) {
+                bgClass = "bg-cyan-900/40";
+              } else {
+                bgClass = "hover:bg-slate-800 transition-colors duration-200";
+              }
+
+              let textClass = "";
+              if (isInitial) {
+                textClass = "text-slate-300 font-bold";
+              } else {
+                textClass = "text-blue-400 font-medium";
+              }
+              if (isSameValue) {
+                textClass += " text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]";
+              }
+              if (completed) {
+                textClass = "text-slate-500";
+              }
+
+              // 枠線の構築 (3x3ブロックを区切る太い線)
+              // `border-slate-600` をベースカラーとし、3x3の区切りだけ太さを変えることで統一感を出す
+              const borderBottom = rowIndex % 3 === 2 && rowIndex !== 8 ? "border-b-[3px]" : "border-b";
+              const borderRight = cellIndex % 3 === 2 && cellIndex !== 8 ? "border-r-[3px]" : "border-r";
+              const borderNoneBottom = rowIndex === 8 ? "border-b-0" : "";
+              const borderNoneRight = cellIndex === 8 ? "border-r-0" : "";
+
+              return (
+                <div
+                  key={`${rowIndex}-${cellIndex}`}
+                  onClick={() => setSelectedCell([rowIndex, cellIndex])}
+                  className={`
+                    flex items-center justify-center text-xl md:text-3xl cursor-pointer select-none
+                    border-slate-600
+                    ${bgClass}
+                    ${textClass}
+                    ${borderBottom} ${borderRight} ${borderNoneBottom} ${borderNoneRight}
+                    ${(isInitial || completed) ? "pointer-events-none" : ""}
+                  `}
+                >
+                  {cell !== 0 ? cell : ""}
+                </div>
+              );
+            })
+          ))}
+        </div>
+        
+        {/* Completed Message */}
+        {completed && (
+           <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
+             🎉 Completed! 🎊
+           </p>
+        )}
+      </div>
+
+      {/* Number Pad Area */}
+      <div className="w-full max-w-[480px] mt-6 flex flex-col gap-3 sm:gap-4">
+        {/* 数字ボタン: 1列に配置 */}
+        <div className="grid grid-cols-9 gap-1 sm:gap-2">
+          {NUMBERS.map((n) => (
+            <button
+              key={n}
+              onClick={onClickNumberButton}
+              disabled={completed}
+              className="aspect-[4/5] sm:aspect-square flex items-center justify-center rounded-lg sm:rounded-xl bg-slate-800 text-slate-200 text-lg sm:text-2xl font-semibold shadow-md border border-slate-700 hover:bg-slate-700 hover:-translate-y-1 hover:shadow-cyan-500/20 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+        
+        {/* キャンセルボタン: 行を変えて大きく配置 */}
+        <div className="flex justify-center mt-2">
+          <button
+            onClick={onClickCancelButton}
+            disabled={completed}
+            className="w-full max-w-[200px] py-3 flex items-center justify-center gap-2 rounded-full bg-red-900/30 text-red-400 text-sm sm:text-base font-bold shadow-lg border border-red-900/50 hover:bg-red-900/50 hover:-translate-y-1 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            消去 (Erase)
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 w-full h-16 bg-slate-900/80 backdrop-blur-xl border-t border-slate-800 flex justify-around items-center px-4 z-50">
+        <div className="flex flex-col items-center justify-center text-cyan-400 cursor-pointer active:scale-95 transition-transform">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span className="text-[10px] font-semibold">Home</span>
+        </div>
+        <div className="flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 cursor-pointer active:scale-95 transition-all">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span className="text-[10px] font-semibold">History</span>
+        </div>
+        <div className="flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 cursor-pointer active:scale-95 transition-all">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <span className="text-[10px] font-semibold">Settings</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default App;
-
