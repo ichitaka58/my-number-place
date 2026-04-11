@@ -8,15 +8,16 @@ import { useTimer } from "../hooks/useTimer";
  */
 type TimerProps = {
   completed: boolean;
-  autoStart: boolean;
+  isRunning: boolean;
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 /**
  * ゲームの経過時間を管理・表示するタイマーコンポーネント
  * 内部で useTimer フックを使用し、状態を管理しています。
  */
-export const Timer = ({ completed, autoStart }: TimerProps) => {
-  const { isRunning, setIsRunning, displayTimer } = useTimer();
+export const Timer = ({ completed, isRunning, setIsRunning }: TimerProps) => {
+  const { displayTimer } = useTimer(isRunning);
 
   // ゲームクリア状態（completed）を監視し、trueになればタイマーを停止する
   useEffect(() => {
@@ -25,12 +26,6 @@ export const Timer = ({ completed, autoStart }: TimerProps) => {
     }
   }, [completed, setIsRunning]);
 
-  // 初回マウント時や再生成時に、autoStart が true であればタイマーを開始させる
-  useEffect(() => {
-    if (autoStart) {
-      setIsRunning(true);
-    }
-  }, [autoStart, setIsRunning]);
 
   return (
     <div className="flex gap-4">
@@ -38,11 +33,9 @@ export const Timer = ({ completed, autoStart }: TimerProps) => {
         <p>Timer:</p>
         <p className="w-11">{displayTimer}</p>
       </div>
-      <button className="text-xs border-2 border-amber-50 px-2 rounded-2xl">
-        start
-      </button>
       <button
         onClick={() => setIsRunning(!isRunning)}
+        disabled={completed}
         className="text-xs border-2 border-amber-50 px-2 rounded-2xl"
       >
         pause

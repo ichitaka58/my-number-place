@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { generateDisplayTimer } from "../utils/time";
 
-export const useTimer = () => {
+export const useTimer = (isRunning: boolean) => {
   const [seconds, setSeconds] = useState(0);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -19,8 +18,6 @@ export const useTimer = () => {
   const displayTimer = generateDisplayTimer(seconds);
 
   return {
-    isRunning,
-    setIsRunning,
     displayTimer,
   };
 };

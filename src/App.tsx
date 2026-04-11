@@ -36,9 +36,12 @@ function App() {
     onClickCancelButton,
   } = useSudoku();
   const [windowWidth, windowHeight] = useWindowSize();
-  // タイマーコンポーネント（<Timer />）をリセットするための識別用ステート
-  // 初期値の0は「最初の読み込み時」、1以上は「New Gameが押されてゲームが始まった状態」を表す
+  // タイマー（<Timer />）をリセットするための識別用キー（New Gameが押されるたびにカウントアップし秒数を0に戻す）
   const [gameId, setGameId] = useState(0);
+
+  // ゲームの進行・一時停止の管理用ステート
+  // 停止時（false）は盤面やNumberPadの入力を無効化（disabled）するためにも利用
+  const [isRunning, setIsRunning] = useState(false);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
   const selectedRow = selectedCell[0];
@@ -54,6 +57,7 @@ function App() {
    */
   const handleStartNewGame = () => {
     handleGenerate();
+    setIsRunning(true);
     setGameId((prev) => prev + 1);
   };
 
@@ -76,10 +80,10 @@ function App() {
       />
       {/* 
         Timer Area 
-        - key={gameId}: 値が変わるたびにTimerがアンマウント・再マウントされ、秒数(seconds)が0にリセットされる
-        - autoStart={gameId > 0}: 初回アクセス時(0)は停止状態、New Gameボタン押下後(1以上)は自動でタイマーが開始される
+        - key={gameId}: 値が変わるたびにTimerコンポーネント全体が初期化され、秒数が0にリセットされる
+        - isRunning: タイマーの動作/停止をApp側から制御・連携するためにPropsとして引き渡す
       */}
-      <Timer key={gameId} completed={completed} autoStart={gameId > 0} />
+      <Timer key={gameId} completed={completed} isRunning={isRunning} setIsRunning={setIsRunning} />
 
       {/* Sudoku Grid Area */}
       <div className="w-full max-w-120 aspect-square relative">
@@ -147,7 +151,7 @@ function App() {
                     ${bgClass}
                     ${textClass}
                     ${borderBottom} ${borderRight} ${borderNoneBottom} ${borderNoneRight}
-                    ${isInitial || completed ? "pointer-events-none" : ""}
+                    ${isInitial || completed || !isRunning ? "pointer-events-none" : ""}
                   `}
                 >
                   {cell !== 0 ? cell : ""}
@@ -170,6 +174,7 @@ function App() {
         onClickNumberButton={onClickNumberButton}
         onClickCancelButton={onClickCancelButton}
         completed={completed}
+        isRunning={isRunning}
       />
 
       {/* Bottom Navigation Bar */}
