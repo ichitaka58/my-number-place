@@ -14,30 +14,51 @@ function useWindowSize() {
 }
 
 import { useSudoku } from "./hooks/useSudoku";
-import { type Level } from "./utils/sudokuLogic";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { NumberPad } from "./components/NumberPad";
 import { GameHeader } from "./components/GameHeader";
+import { Timer } from "./components/Timer";
 
 /**
  * ナンバープレース（数独）のメイン・アプリケーションコンポーネント (Sleek Dark Theme)
  */
 function App() {
-  const { matrix, initialBoard, selectedCell, level, setLevel, setSelectedCell, completed, handleGenerate, onClickNumberButton, onClickCancelButton } = useSudoku();
+  const {
+    matrix,
+    initialBoard,
+    selectedCell,
+    level,
+    setLevel,
+    setSelectedCell,
+    completed,
+    handleGenerate,
+    onClickNumberButton,
+    onClickCancelButton,
+  } = useSudoku();
   const [windowWidth, windowHeight] = useWindowSize();
-
-  // コンポーネントの初回マウント時に一度だけ盤面を自動生成する
-  useEffect(() => {
-    handleGenerate();
-  }, []);
+  // タイマーコンポーネント（<Timer />）をリセットするための識別用ステート
+  // 初期値の0は「最初の読み込み時」、1以上は「New Gameが押されてゲームが始まった状態」を表す
+  const [gameId, setGameId] = useState(0);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
   const selectedRow = selectedCell[0];
   const selectedCol = selectedCell[1];
-  const selectedValue = (selectedRow >= 0 && selectedCol >= 0) ? matrix[selectedRow]?.[selectedCol] ?? 0 : 0;
+  const selectedValue =
+    selectedRow >= 0 && selectedCol >= 0
+      ? (matrix[selectedRow]?.[selectedCol] ?? 0)
+      : 0;
+
+  /**
+   * 新しいゲームを開始するハンドラー関数
+   * 盤面の事前生成処理を利用し、ゲーム回数（gameId）を進めることでTimerコンポーネントを初期化させます。
+   */
+  const handleStartNewGame = () => {
+    handleGenerate();
+    setGameId((prev) => prev + 1);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-['Inter',_sans-serif] text-slate-100 flex flex-col items-center pt-8 pb-24 px-4 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 font-['Inter',sans-serif] text-slate-100 flex flex-col items-center pt-8 pb-24 px-4 overflow-x-hidden">
       {completed && (
         <Confetti
           width={windowWidth}
@@ -48,12 +69,22 @@ function App() {
       )}
 
       {/* Header Area */}
-      <GameHeader level={level} setLevel={setLevel} handleGenerate={handleGenerate} />
+      <GameHeader
+        level={level}
+        setLevel={setLevel}
+        handleStartNewGame={handleStartNewGame}
+      />
+      {/* 
+        Timer Area 
+        - key={gameId}: 値が変わるたびにTimerがアンマウント・再マウントされ、秒数(seconds)が0にリセットされる
+        - autoStart={gameId > 0}: 初回アクセス時(0)は停止状態、New Gameボタン押下後(1以上)は自動でタイマーが開始される
+      */}
+      <Timer key={gameId} completed={completed} autoStart={gameId > 0} />
 
       {/* Sudoku Grid Area */}
-      <div className="w-full max-w-[480px] aspect-square relative">
+      <div className="w-full max-w-120 aspect-square relative">
         <div
-          className={`w-full h-full grid grid-cols-9 bg-slate-900 border-2 border-cyan-400 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-700 ${completed ? "blur-sm grayscale-[50%]" : ""}`}
+          className={`w-full h-full grid grid-cols-9 bg-slate-900 border-2 border-cyan-400 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all duration-700 ${completed ? "blur-sm grayscale-50" : ""}`}
         >
           {matrix.map((row, rowIndex) =>
             row.map((cell, cellIndex) => {
@@ -128,7 +159,7 @@ function App() {
 
         {/* Completed Message */}
         {completed && (
-          <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
+          <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
             🎉 Completed! 🎊
           </p>
         )}
