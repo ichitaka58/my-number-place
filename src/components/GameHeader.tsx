@@ -1,13 +1,26 @@
 import type { Level } from "../utils/sudokuLogic";
 
+/**
+ * GameHeaderコンポーネントのプロパティ定義
+ * @property {Level} level - 現在選択中の難易度（easy/medium/hard/debug）
+ * @property {React.Dispatch<React.SetStateAction<Level>>} setLevel - 難易度を変更するための状態更新関数
+ * @property {function} handleStartNewGame - 新しいゲームを開始するための関数
+ */
 type GameHeaderProps = {
-    level: Level;
-    setLevel: React.Dispatch<React.SetStateAction<Level>>;
-    handleGenerate: () => void;
-}
+  level: Level;
+  setLevel: React.Dispatch<React.SetStateAction<Level>>;
+  handleStartNewGame: () => void;
+};
 
-export const GameHeader = ({ level, setLevel, handleGenerate }: GameHeaderProps) => {
-
+/**
+ * 操作ヘッダーコンポーネント
+ * アプリのタイトル、難易度の設定プルダウン、および新規ゲームスタートボタンを提供します。
+ */
+export const GameHeader = ({
+  level,
+  setLevel,
+  handleStartNewGame,
+}: GameHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[480px] mb-6 gap-4 sm:gap-0">
       <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.4)] whitespace-nowrap">
@@ -25,7 +38,7 @@ export const GameHeader = ({ level, setLevel, handleGenerate }: GameHeaderProps)
           <option value="debug">Debug</option>
         </select>
         <button
-          onClick={handleGenerate}
+          onClick={handleStartNewGame}
           className="bg-blue-600 hover:bg-blue-500 text-white text-sm md:text-base font-semibold py-2 px-4 rounded-lg shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 active:translate-y-0 transition-all"
         >
           New Game
