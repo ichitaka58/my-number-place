@@ -83,7 +83,12 @@ function App() {
         - key={gameId}: 値が変わるたびにTimerコンポーネント全体が初期化され、秒数が0にリセットされる
         - isRunning: タイマーの動作/停止をApp側から制御・連携するためにPropsとして引き渡す
       */}
-      <Timer key={gameId} completed={completed} isRunning={isRunning} setIsRunning={setIsRunning} />
+      <Timer
+        key={gameId}
+        completed={completed}
+        isRunning={isRunning}
+        setIsRunning={setIsRunning}
+      />
 
       {/* Sudoku Grid Area */}
       <div className="w-full max-w-120 aspect-square relative">
@@ -127,6 +132,9 @@ function App() {
               if (completed) {
                 textClass = "text-slate-500";
               }
+              if (!isRunning) {
+                textClass = "text-transparent";
+              }
 
               // 枠線の構築 (3x3ブロックを区切る太い線)
               // `border-slate-600` をベースカラーとし、3x3の区切りだけ太さを変えることで統一感を出す
@@ -152,6 +160,7 @@ function App() {
                     ${textClass}
                     ${borderBottom} ${borderRight} ${borderNoneBottom} ${borderNoneRight}
                     ${isInitial || completed || !isRunning ? "pointer-events-none" : ""}
+                    ${!isRunning ? "opacity-20" : ""}
                   `}
                 >
                   {cell !== 0 ? cell : ""}
@@ -160,7 +169,12 @@ function App() {
             }),
           )}
         </div>
-
+        {/* Pause Action */}
+        {gameId > 0 && !isRunning && (
+          <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
+            ⏸️ Pause! 
+          </p>
+        )}
         {/* Completed Message */}
         {completed && (
           <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
