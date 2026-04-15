@@ -131,6 +131,8 @@ function App() {
         completed={completed}
         isRunning={isRunning}
         setIsRunning={setIsRunning}
+        userName={userName}
+        level={level}
       />
 
       {/* Sudoku Grid Area */}
