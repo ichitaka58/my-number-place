@@ -19,5 +19,6 @@ export const useTimer = (isRunning: boolean) => {
 
   return {
     displayTimer,
+    seconds,
   };
 };

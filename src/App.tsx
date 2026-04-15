@@ -53,13 +53,18 @@ function App() {
       ? (matrix[selectedRow]?.[selectedCol] ?? 0)
       : 0;
 
-
+  /**
+   * ユーザー名入力しゲーム画面を表示する関数
+   */
   const handleStart = () => {
-    if(!userName) {
+    // ユーザー名が未入力の場合は、デフォルトで「ゲストユーザー」を設定する
+    if (!userName) {
       setUserName("ゲストユーザー");
     }
+    // ゲームを開始し、ゲーム画面の表示に切り替える
     setIsStarted(true);
-  }
+  };
+
   /**
    * 新しいゲームを開始するハンドラー関数
    * 盤面の事前生成処理を利用し、ゲーム回数（gameId）を進めることでTimerコンポーネントを初期化させます。
@@ -70,7 +75,7 @@ function App() {
     setGameId((prev) => prev + 1);
   };
 
-  if(!isStarted) {
+  if (!isStarted) {
     return (
       <div className="min-h-screen bg-slate-950 font-['Inter',sans-serif] text-slate-100 flex flex-col items-center justify-center pt-8 pb-24 px-4 overflow-x-hidden">
         <div className="text-center p-10 bg-slate-900 border-2 border-cyan-400 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.5)]">
@@ -126,6 +131,8 @@ function App() {
         completed={completed}
         isRunning={isRunning}
         setIsRunning={setIsRunning}
+        userName={userName}
+        level={level}
       />
 
       {/* Sudoku Grid Area */}
@@ -210,7 +217,7 @@ function App() {
         {/* Pause Action */}
         {gameId > 0 && !isRunning && (
           <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
-            ⏸️ Pause! 
+            ⏸️ Pause!
           </p>
         )}
         {/* Completed Message */}
