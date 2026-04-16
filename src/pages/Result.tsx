@@ -9,18 +9,28 @@ import type { Level } from "../utils/sudokuLogic";
 const Result = () => {
   const [records, setRecords] = useState<Record[]>([]);
   const [mockRecords] = useState(mockData);
-  const [selectedLevel, setSelectedLevel] = useState<Level>("easy");
+  const [selectedLevel, setSelectedLevel] = useState<string>("easy");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const buttonContext = [
+    ["easy", "Easy"],
+    ["medium", "Medium"],
+    ["hard", "Hard"],
+    ["debug", "Debug"]
+  ];
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       const data = await fetchResults();
-      if (data) setRecords(data);
+      if (data) {
+        const records = data.filter((r) => r.level === selectedLevel);
+        setRecords(records);
+      }
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [selectedLevel]);
 
   return (
     <div className="min-h-screen bg-slate-950 font-['Inter',sans-serif] text-slate-100 flex flex-col items-center justify-center pt-8 pb-24 px-4 overflow-x-hidden">
@@ -29,13 +39,21 @@ const Result = () => {
           Result
         </h1>
         <div className="flex justify-center gap-4 mb-4">
-          <button>Easy</button>
-          <button>Medium</button>
-          <button>Hard</button>
+          {buttonContext.map((row, rowIndex) => (
+            <button
+              key={rowIndex}
+              onClick={() => setSelectedLevel(row[0])}
+              className="hover:cursor-pointer"
+            >
+              {row[1]}
+            </button>
+          ))}
         </div>
         <ul className="space-y-2">
           {loading ? (
             <li className="text-cyan-400">Loading</li>
+          ) : records.length === 0 ? (
+            <li className="text-sm">データがありません</li>
           ) : (
             records.map((r) => (
               <li
