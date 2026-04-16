@@ -1,0 +1,66 @@
+[
+  {
+    "id": 101,
+    "userName": "test1",
+    "time": 120,
+    "level": "medium",
+    "createdAt": "2025-01-01 11:30:00",
+    "updatedAt": "2025-01-01 11:30:00"
+  },
+  {
+    "id": 102,
+    "userName": "test2",
+    "time": 193,
+    "level": "medium",
+    "createdAt": "2025-01-02 11:30:00",
+    "updatedAt": "2025-01-02 11:30:00"
+  },
+  {
+    "id": 103,
+    "userName": "test3",
+    "time": 241,
+    "level": "hard",
+    "createdAt": "2025-01-03 11:30:00",
+    "updatedAt": "2025-01-03 11:30:00"
+  },
+  {
+    "id": 104,
+    "userName": "test4",
+    "time": 53,
+    "level": "hard",
+    "createdAt": "2025-01-04 11:30:00",
+    "updatedAt": "2025-01-04 11:30:00"
+  },
+  {
+    "id": 105,
+    "userName": "test5",
+    "time": 375,
+    "level": "easy",
+    "createdAt": "2025-01-05 11:30:00",
+    "updatedAt": "2025-01-05 11:30:00"
+  },
+  {
+    "id": 106,
+    "userName": "test6",
+    "time": 75,
+    "level": "easy",
+    "createdAt": "2025-01-06 11:30:00",
+    "updatedAt": "2025-01-06 11:30:00"
+  },
+  {
+    "id": 107,
+    "userName": "test7",
+    "time": 33,
+    "level": "debug",
+    "createdAt": "2025-01-07 11:30:00",
+    "updatedAt": "2025-01-07 11:30:00"
+  },
+  {
+    "id": 108,
+    "userName": "test8",
+    "time": 42,
+    "level": "debug",
+    "createdAt": "2025-01-08 11:30:00",
+    "updatedAt": "2025-01-08 11:30:00"
+  }
+]
