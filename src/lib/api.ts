@@ -1,3 +1,4 @@
+import type { Record } from "../types";
 
 // バックエンドAPIのベースURL
 const API_URL = "http://localhost:8888";
@@ -22,9 +23,25 @@ export const createResult = async (userName: string, totalTime: number, level: s
       }),
     });
     if (!response.ok) {
-      throw new Error("タイムの保存に失敗しました");
+      throw new Error("クリアタイムの保存に失敗しました");
     }
   } catch (error) {
     console.error("Error save record:", error);
   }
 };
+
+export const fetchResults = async (): Promise<Record[]> => {
+  try {
+    const response = await fetch(`${API_URL}/api/clear-times`);
+    console.log(response);
+
+    if(!response.ok) {
+      throw new Error("クリアタイム一覧取得に失敗しました")
+    }
+    const data = await response.json();
+    return data;
+  }catch(error) {
+    console.error("Error fetching records:", error);
+    throw error;
+  }
+}
