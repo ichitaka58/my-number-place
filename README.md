@@ -1,5 +1,7 @@
 # My Number Place (フロントエンド)
 
+[🚀 Live Demoを見る](https://my-number-place.vercel.app/)
+
 このプロジェクトは、「ナンプレ」をプレイできるWebアプリケーションのフロントエンドです。
 難易度ごとのパズルを解き、クリアタイムを測定・バックエンドに保存してランキングとして確認することができます。
 
@@ -65,3 +67,16 @@ npm run preview
 
 本アプリケーションは以下のバックエンドと連携して動作します。
 * **[my-number-place-backend](https://github.com/ichitaka58/my-number-place-backend)** (Node.js/Express + Prisma)
+
+## デプロイ (Vercel)
+
+このフロントエンドアプリケーションは [Vercel](https://vercel.com/) にデプロイされています。
+
+### 本番環境での環境変数の設定
+Vercelのダッシュボード（`Settings` > `Environment Variables`）にて、デプロイ済みのバックエンドAPIを指すように以下の環境変数を設定してください。
+
+* `VITE_API_URL`: `<バックエンドの公開URL>` (例: `https://my-number-place-backend.onrender.com` など)
+
+### デプロイ運用
+`main` ブランチにコードがPushされると、Vercelによって自動的にビルドとデプロイが行われます。
+
