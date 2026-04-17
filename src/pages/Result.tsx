@@ -3,14 +3,11 @@ import { BottomNavigation } from "../components/BottomNavigation";
 import { fetchResults } from "../lib/api";
 import type { Record } from "../types";
 import { generateDisplayTimer } from "../utils/time";
-import mockData from "../mock/mockRecords.json";
 import CircularProgress from "@mui/material/CircularProgress";
 
 const Result = () => {
   // 取得した成績データを保持するステート
   const [records, setRecords] = useState<Record[]>([]);
-  // 現在は未使用のモックデータ
-  const [mockRecords] = useState(mockData);
   // 選択されている難易度レベル
   const [selectedLevel, setSelectedLevel] = useState<string>("easy");
   // データ取得中かどうかのローディング状態
