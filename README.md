@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# My Number Place (フロントエンド)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+このプロジェクトは、「ナンプレ」をプレイできるWebアプリケーションのフロントエンドです。
+難易度ごとのパズルを解き、クリアタイムを測定・バックエンドに保存してランキングとして確認することができます。
 
-Currently, two official plugins are available:
+## 技術スタック
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* **ライブラリ/フレームワーク**: [React](https://react.dev/), [Vite](https://vitejs.dev/)
+* **言語**: TypeScript
+* **スタイリング**: [Tailwind CSS](https://tailwindcss.com/)
+* **UIコンポーネント**: [Material UI (MUI)](https://mui.com/)
+* **ルーティング**: React Router
 
-## React Compiler
+## 主な機能
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **ナンプレプレイ機能**: 動的に生成される数独パズルを解くことができます。
+* **難易度選択**: Easy, Medium, Hard, Debug などのレベルから選択可能です。
+* **タイマー機能**: パズルを開始してからの経過時間をリアルタイムで計測します。
+* **クリアタイムの保存・表示**: バックエンドAPIと連携し、ゲームのクリア時間を成績（Result）として一覧表示します。
 
-## Expanding the ESLint configuration
+## 開発環境のセットアップ手順
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. リポジトリのクローンと依存関係のインストール
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/ichitaka58/my-number-place.git
+cd my-number-place
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 環境変数の設定
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+プロジェクトのルートディレクトリに `.env` ファイルを作成し、必要な環境変数（バックエンドAPIのURLなど）を設定します。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=http://localhost:8888
 ```
+※ 使用している環境に合わせてURLを変更してください。
+
+### 3. アプリケーションの起動
+
+開発モードで起動する場合：
+```bash
+npm run dev
+```
+
+ビルドしてプレビューする場合：
+```bash
+npm run build
+npm run preview
+```
+
+アプリケーションはデフォルトで `http://localhost:5173` などのURLで起動します（Viteのデフォルト）。
+
+## 構造
+
+* `/src/components`: ナンバーパッドやタイマー、ナビゲーションなどの共通UIコンポーネント
+* `/src/pages`: Home, Result, NotFound などのページコンポーネント
+* `/src/router`: 画面遷移（ルーティング）の設定
+* `/src/utils`: 時間計算などのユーティリティ関数
+* `/src/lib/api.ts`: バックエンドとの通信処理
+* `/src/mock`: 開発やテスト用のモックデータ
+
+## バックエンドシステム
+
+本アプリケーションは以下のバックエンドと連携して動作します。
+* **[my-number-place-backend](https://github.com/ichitaka58/my-number-place-backend)** (Node.js/Express + Prisma)
