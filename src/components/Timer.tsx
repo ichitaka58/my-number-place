@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useTimer } from "../hooks/useTimer";
 import type { Level } from "../utils/sudokuLogic";
 import { createResult } from "../lib/api";
-
+import { FaRegCirclePause } from "react-icons/fa6";
 /**
  * Timerコンポーネントのプロパティ定義
  * @property {boolean} completed - ゲームがクリアされたかどうかを示すフラグ
@@ -39,7 +39,7 @@ export const Timer = ({
   }, [completed, setIsRunning]);
 
   return (
-    <div className="flex gap-4">
+    <div className="flex justify-center items-center max-w-120 w-full relative">
       <div className="flex gap-1">
         <p>Timer:</p>
         <p className="w-11">{displayTimer}</p>
@@ -47,9 +47,9 @@ export const Timer = ({
       <button
         onClick={() => setIsRunning(!isRunning)}
         disabled={completed}
-        className="text-xs border-2 border-amber-50 px-2 rounded-2xl"
+        className="absolute right-0 pr-2 text-lg cursor-pointer"
       >
-        pause
+        <FaRegCirclePause />
       </button>
     </div>
   );
