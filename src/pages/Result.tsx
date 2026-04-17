@@ -4,7 +4,7 @@ import { fetchResults } from "../lib/api";
 import type { Record } from "../types";
 import { generateDisplayTimer } from "../utils/time";
 import mockData from "../mock/mockRecords.json";
-import type { Level } from "../utils/sudokuLogic";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Result = () => {
   const [records, setRecords] = useState<Record[]>([]);
@@ -43,7 +43,7 @@ const Result = () => {
             <button
               key={rowIndex}
               onClick={() => setSelectedLevel(row[0])}
-              className="hover:cursor-pointer"
+              className={`cursor-pointer active:scale-95 transition-all border-b-2 border-b-transparent ${selectedLevel === row[0] ? "text-cyan-400  hover:border-cyan-400" : "text-slate-500 hover:text-slate-300 hover:border-slate-300"}`}
             >
               {row[1]}
             </button>
@@ -51,22 +51,21 @@ const Result = () => {
         </div>
         <ul className="space-y-2">
           {loading ? (
-            <li className="text-cyan-400">Loading</li>
+            <CircularProgress aria-label="Loading..." className="mt-8" />
           ) : records.length === 0 ? (
-            <li className="text-sm">データがありません</li>
+            <li className="text-sm mt-8">データがありません</li>
           ) : (
             records.map((r) => (
               <li
                 key={r.id}
-                className="flex justify-around items-center border-b-2 border-blue-400 pb-1"
+                className="flex items-center px-4 border-b-2 border-blue-400 pb-1"
               >
-                <span className="w-30 text-left text-sm truncate">
+                <span className="flex-1 text-left text-sm truncate">
                   {r.userName}
                 </span>
                 <span className="w-12 text-right text-cyan-400 tabular-nums [text-shadow:0_0_10px_rgba(34,211,238,0.8)]">
                   {generateDisplayTimer(r.time)}
                 </span>
-                <span className="w-20 text-center text-sm">{r.level}</span>
               </li>
             ))
           )}
