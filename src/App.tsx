@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import PATHS from "./router/paths";
 import Result from "./pages/Result";
+import NotFound from "./pages/NotFound";
 
 /**
  * アプリケーションのルートコンポーネント
@@ -17,6 +18,8 @@ function App() {
           <Route path={PATHS.HOME} element={<Home />} />
           {/* クリア結果一覧画面 */}
           <Route path={PATHS.RESULT} element={<Result />} />
+          {/* 404 Not Found画面 */}
+          <Route path={PATHS.NOTFOUND} element={<NotFound />} />
         </Routes>
       </Router>
     </>
