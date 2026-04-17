@@ -33,7 +33,6 @@ export const createResult = async (userName: string, totalTime: number, level: s
 export const fetchResults = async (): Promise<Record[]> => {
   try {
     const response = await fetch(`${API_URL}/api/clear-times`);
-    console.log(response);
 
     if(!response.ok) {
       throw new Error("クリアタイム一覧取得に失敗しました")

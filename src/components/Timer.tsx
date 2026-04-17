@@ -40,10 +40,12 @@ export const Timer = ({
 
   return (
     <div className="flex justify-center items-center max-w-120 w-full relative">
+      {/* タイマー表示 */}
       <div className="flex gap-1">
         <p>Timer:</p>
         <p className="w-11">{displayTimer}</p>
       </div>
+      {/* ポーズボタン */}
       <button
         onClick={() => setIsRunning(!isRunning)}
         disabled={completed}
