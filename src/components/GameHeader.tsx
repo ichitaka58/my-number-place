@@ -22,7 +22,7 @@ export const GameHeader = ({
   handleStartNewGame,
 }: GameHeaderProps) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[480px] mb-6 gap-4 sm:gap-0">
+    <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-120 mb-6 gap-4 sm:gap-0">
       <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.4)] whitespace-nowrap">
         My Number Place
       </h1>
