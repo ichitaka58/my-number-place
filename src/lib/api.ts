@@ -1,7 +1,7 @@
 import type { Record } from "../types";
 
 // バックエンドAPIのベースURL
-const API_URL = "http://localhost:8888";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8888";
 
 /**
  * ゲームクリア結果をサーバーに保存する
