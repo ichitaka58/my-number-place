@@ -18,8 +18,21 @@ const Result = () => {
     ["easy", "Easy"],
     ["medium", "Medium"],
     ["hard", "Hard"],
-    ["debug", "Debug"]
+    ["debug", "Debug"],
   ];
+
+  // クリックした行のIDを保持するステート
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleSelectItem = (id: number) => {
+    setOpen(!open);
+    if (open) {
+      setSelectedItemId(id);
+    } else {
+      setSelectedItemId(null);
+    }
+  };
 
   // selectedLevel（選択された難易度）が変更されるたびにデータを取得する
   useEffect(() => {
@@ -65,14 +78,22 @@ const Result = () => {
             records.map((record) => (
               <li
                 key={record.id}
-                className="flex items-center px-4 border-b-2 border-blue-400 pb-1"
+                onClick={() => handleSelectItem(record.id)}
+                className="flex items-center border-b-2 border-blue-400"
               >
-                <span className="flex-1 text-left text-sm truncate">
-                  {record.userName}
-                </span>
-                <span className="w-12 text-right text-cyan-400 tabular-nums [text-shadow:0_0_10px_rgba(34,211,238,0.8)]">
-                  {generateDisplayTimer(record.time)}
-                </span>
+                <div className="flex flex-1 px-4">
+                  <span className="flex-1 text-left text-sm truncate">
+                    {record.userName}
+                  </span>
+                  <span className="w-12 text-right text-cyan-400 tabular-nums [text-shadow:0_0_10px_rgba(34,211,238,0.8)]">
+                    {generateDisplayTimer(record.time)}
+                  </span>
+                </div>
+                {selectedItemId === record.id && (
+                  <button className="bg-red-500 text-slate-300 text-sm px-2 h-6 animate-slide-in-right [box-shadow:0_0_10px_rgba(239,68,68,0.8)]">
+                    削除
+                  </button>
+                )}
               </li>
             ))
           )}
