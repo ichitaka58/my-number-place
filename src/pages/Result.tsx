@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BottomNavigation } from "../components/BottomNavigation";
-import { fetchResults } from "../lib/api";
+import { deleteResult, fetchResults } from "../lib/api";
 import type { Record } from "../types";
 import { generateDisplayTimer } from "../utils/time";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -49,6 +49,22 @@ const Result = () => {
     loadData();
   }, [selectedLevel]);
 
+  // 削除ボタンクリック時の処理
+  // DB削除が成功した場合のみstateを更新し、UIとDBの整合性を保つ
+  const handleDeleteRecord = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: number,
+  ) => {
+    e.stopPropagation(); // 親要素（li）のクリックイベントへの伝播を防ぐ
+    try {
+      await deleteResult(id);
+      setRecords((prev) => prev.filter((r) => r.id !== id)); // 削除済みレコードをstateから除外
+      setSelectedItemId(null);
+    } catch {
+      alert("削除に失敗しました。再度お試しください。");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 font-['Inter',sans-serif] text-slate-100 flex flex-col items-center justify-center pt-8 pb-24 px-4 overflow-x-hidden">
       <div className="min-w-84 min-h-72 text-center p-10 bg-slate-900 border-2 border-cyan-400 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.5)]">
@@ -79,7 +95,7 @@ const Result = () => {
               <li
                 key={record.id}
                 onClick={() => handleSelectItem(record.id)}
-                className="flex items-center border-b-2 border-blue-400"
+                className="flex items-center border-b-2 border-blue-400 cursor-pointer"
               >
                 <div className="flex flex-1 px-4">
                   <span className="flex-1 text-left text-sm truncate">
@@ -90,7 +106,10 @@ const Result = () => {
                   </span>
                 </div>
                 {selectedItemId === record.id && (
-                  <button className="bg-red-500 text-slate-300 text-sm px-2 h-6 animate-slide-in-right [box-shadow:0_0_10px_rgba(239,68,68,0.8)]">
+                  <button
+                    onClick={(e) => handleDeleteRecord(e,record.id)}
+                    className="bg-red-500 text-slate-300 text-sm px-2 h-6 animate-slide-in-right [box-shadow:0_0_10px_rgba(239,68,68,0.8)]"
+                  >
                     削除
                   </button>
                 )}
