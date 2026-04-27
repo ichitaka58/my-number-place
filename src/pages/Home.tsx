@@ -16,7 +16,7 @@ import { useSudoku } from "../hooks/useSudoku";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { NumberPad } from "../components/NumberPad";
 import { GameHeader } from "../components/GameHeader";
-import { Timer } from "../components/Timer";
+import { TimerAndLevel } from "../components/TimerAndLevel";
 
 const Home = () => {
   const {
@@ -118,19 +118,22 @@ const Home = () => {
         setLevel={setLevel}
         handleStartNewGame={handleStartNewGame}
       />
+
       {/* 
         Timer Area 
         - key={gameId}: 値が変わるたびにTimerコンポーネント全体が初期化され、秒数が0にリセットされる
         - isRunning: タイマーの動作/停止をApp側から制御・連携するためにPropsとして引き渡す
       */}
-      <Timer
+      <TimerAndLevel
         key={gameId}
         completed={completed}
         isRunning={isRunning}
         setIsRunning={setIsRunning}
         userName={userName}
         level={level}
+        setLevel={setLevel}
       />
+
 
       {/* Sudoku Grid Area */}
       <div className="w-full max-w-120 aspect-square relative">

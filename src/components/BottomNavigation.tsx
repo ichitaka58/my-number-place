@@ -9,7 +9,7 @@ export const BottomNavigation = () => {
   // 現在のパスを取得してアクティブなメニュー項目を判定する
   const { pathname } = useLocation();
   return (
-    <div className="fixed bottom-0 left-0 w-full h-16 bg-slate-900/80 backdrop-blur-xl border-t border-slate-800 flex justify-around items-center px-4 z-50">
+    <div className="fixed bottom-0 w-full max-w-120 mx-auto h-16 bg-slate-900/80 backdrop-blur-xl border-t border-slate-800 flex justify-around items-center px-4 z-50">
       <div
         className={`flex flex-col items-center justify-center ${pathname === PATHS.HOME ? "text-cyan-400 cursor-pointer active:scale-95 transition-transform" : "text-slate-500 hover:text-slate-300 cursor-pointer active:scale-95 transition-all"}`}
       >
