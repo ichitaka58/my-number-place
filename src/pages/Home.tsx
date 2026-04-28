@@ -102,7 +102,7 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 font-['Inter',sans-serif] text-slate-100 flex flex-col items-center pt-8 pb-24 px-4 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 font-['Inter',sans-serif] text-slate-100 flex flex-col items-center pt-4 pb-24 px-4 overflow-x-hidden">
       {completed && (
         <Confetti
           width={windowWidth}
@@ -113,16 +113,13 @@ const Home = () => {
       )}
 
       {/* Header Area */}
-      <GameHeader
-        level={level}
-        setLevel={setLevel}
-        handleStartNewGame={handleStartNewGame}
-      />
+      <GameHeader />
 
       {/* 
-        Timer Area 
+        Timer And Level Area 
         - key={gameId}: 値が変わるたびにTimerコンポーネント全体が初期化され、秒数が0にリセットされる
         - isRunning: タイマーの動作/停止をApp側から制御・連携するためにPropsとして引き渡す
+        - Level(難易度)の選択
       */}
       <TimerAndLevel
         key={gameId}
@@ -133,7 +130,6 @@ const Home = () => {
         level={level}
         setLevel={setLevel}
       />
-
 
       {/* Sudoku Grid Area */}
       <div className="w-full max-w-120 aspect-square relative">
@@ -234,6 +230,7 @@ const Home = () => {
         onClickCancelButton={onClickCancelButton}
         completed={completed}
         isRunning={isRunning}
+        handleStartNewGame={handleStartNewGame}
       />
 
       {/* Bottom Navigation Bar */}
