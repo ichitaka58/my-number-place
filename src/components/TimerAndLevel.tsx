@@ -3,30 +3,33 @@ import { useTimer } from "../hooks/useTimer";
 import type { Level } from "../utils/sudokuLogic";
 import { createResult } from "../lib/api";
 import { FaRegCirclePause } from "react-icons/fa6";
+import { LevelSelectButton } from "./LevelSelectButton";
 /**
  * Timerコンポーネントのプロパティ定義
  * @property {boolean} completed - ゲームがクリアされたかどうかを示すフラグ
  * @property {boolean} autoStart - Timerマウント時にカウントを自動で開始するかどうかのフラグ
  */
-type TimerProps = {
+type TimerAndLevelProps = {
   completed: boolean;
   isRunning: boolean;
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>;
   userName: string;
   level: Level;
+  setLevel: React.Dispatch<React.SetStateAction<Level>>;
 };
 
 /**
  * ゲームの経過時間を管理・表示するタイマーコンポーネント
  * 内部で useTimer フックを使用し、状態を管理しています。
  */
-export const Timer = ({
+export const TimerAndLevel = ({
   completed,
   isRunning,
   setIsRunning,
   userName,
   level,
-}: TimerProps) => {
+  setLevel,
+}: TimerAndLevelProps) => {
   const { displayTimer, seconds } = useTimer(isRunning);
 
   // ゲームクリア時にタイマーを停止し、クリア結果をサーバーに保存する
@@ -39,7 +42,8 @@ export const Timer = ({
   }, [completed, setIsRunning]);
 
   return (
-    <div className="flex justify-center items-center max-w-120 w-full relative">
+    <div className="flex justify-center items-center max-w-120 w-full relative mb-1">
+      <LevelSelectButton level={level} setLevel={setLevel}/>
       {/* タイマー表示 */}
       <div className="flex gap-1">
         <p>Timer:</p>
