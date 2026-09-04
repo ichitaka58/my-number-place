@@ -213,3 +213,40 @@ export const areGridsEqual = (
     return row.every((cell, j) => cell === grid2[i][j]);
   });
 };
+
+/**
+ * 選択セルに数字を置いた後、関連するメモ数字を消した新しいメモ配列を返す（非破壊）。
+ * - 選択セル自身のメモは全て消す
+ * - 同じ行・列・3×3ブロックの各セルからvalueと同じメモ数字を消す
+ *
+ * @param {Set<number>[][]} memos - 現在のメモ数字の9×9配列
+ * @param {number} row - 選択セルの行インデックス（0-8）
+ * @param {number} col - 選択セルの列インデックス（0-8）
+ * @param {number} value - 選択セルに置いた数字（1-9）
+ * @returns {Set<number>[][]} 更新後の新しいメモ数字の9×9配列(引数のmemosは変更しない)
+ */
+export const clearMemosAfterPlacement = (
+  memos: Set<number>[][],
+  row: number,
+  col: number,
+  value: number,
+): Set<number>[][] => {
+  // メモ数字のマトリックスをコピー
+  const newMemos = memos.map((r) => r.map((cell) => new Set(cell)));
+  // 同じ行にある同じメモ数字を消す
+  newMemos[row].forEach((cell) => cell.delete(value));
+  // 同じ列にある同じメモ数字を消す
+  newMemos.forEach((gridRow) => gridRow[col].delete(value));
+  // 選択したマスのメモ数字をクリアする
+  newMemos[row][col] = new Set();
+
+  // 3×3ブロック内の同じメモ数字を消す
+  const blockRowStart = Math.floor(row / 3) * 3;
+  const blockColStart = Math.floor(col / 3) * 3;
+  for (let r = blockRowStart; r < blockRowStart + 3; r++) {
+    for (let c = blockColStart; c < blockColStart + 3; c++) {
+      newMemos[r][c].delete(value);
+    }
+  }
+  return newMemos;
+};
