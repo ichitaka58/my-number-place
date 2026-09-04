@@ -1,4 +1,3 @@
-
 export const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 /**
@@ -8,23 +7,22 @@ export const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
  * @returns {number[]} シャッフルされた新しい配列
  */
 export const shuffled = (array: readonly number[]): number[] => {
-    const result = [...array];
-    for (let i = result.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
 };
-
 
 /**
  * 9x9の空のグリッド（すべての要素が0）を生成する
- * 
+ *
  * @returns {number[][]} 9x9の2次元配列
  */
 export const createEmptyGrid = (): number[][] => {
-    const emptyGrid = Array.from({ length: 9 }, () => Array(9).fill(0));
-    return emptyGrid;
+  const emptyGrid = Array.from({ length: 9 }, () => Array(9).fill(0));
+  return emptyGrid;
 };
 
 /**
@@ -38,29 +36,29 @@ export const createEmptyGrid = (): number[][] => {
  * @returns {boolean} 配置可能な場合はtrue、そうでない場合はfalse
  */
 const isValid = (
-    grid: number[][],
-    row: number,
-    col: number,
-    num: number,
+  grid: number[][],
+  row: number,
+  col: number,
+  num: number,
 ): boolean => {
-    // 行チェック
-    if (grid[row].includes(num)) return false;
+  // 行チェック
+  if (grid[row].includes(num)) return false;
 
-    // 列チェック
-    for (let r = 0; r < 9; r++) {
-        if (grid[r][col] === num) return false;
+  // 列チェック
+  for (let r = 0; r < 9; r++) {
+    if (grid[r][col] === num) return false;
+  }
+
+  // 3×3ブロックチェック
+  const blockRowStart = Math.floor(row / 3) * 3;
+  const blockColStart = Math.floor(col / 3) * 3;
+  for (let r = blockRowStart; r < blockRowStart + 3; r++) {
+    for (let c = blockColStart; c < blockColStart + 3; c++) {
+      if (grid[r][c] === num) return false;
     }
+  }
 
-    // 3×3ブロックチェック
-    const br = Math.floor(row / 3) * 3;
-    const bc = Math.floor(col / 3) * 3;
-    for (let r = br; r < br + 3; r++) {
-        for (let c = bc; c < bc + 3; c++) {
-            if (grid[r][c] === num) return false;
-        }
-    }
-
-    return true;
+  return true;
 };
 
 /**
@@ -70,26 +68,26 @@ const isValid = (
  * @returns {number[][]} 完成した9x9の数独盤面
  */
 export const generateNumberPlace = (): number[][] => {
-    const grid = createEmptyGrid();
+  const grid = createEmptyGrid();
 
-    const solve = (pos: number): boolean => {
-        if (pos === 81) return true;
+  const solve = (pos: number): boolean => {
+    if (pos === 81) return true;
 
-        const row = Math.floor(pos / 9);
-        const col = pos % 9;
-        const candidates = shuffled(NUMBERS);
+    const row = Math.floor(pos / 9);
+    const col = pos % 9;
+    const candidates = shuffled(NUMBERS);
 
-        for (const num of candidates) {
-            if (isValid(grid, row, col, num)) {
-                grid[row][col] = num;
-                if (solve(pos + 1)) return true;
-                grid[row][col] = 0; // バックトラック
-            }
-        }
-        return false;
-    };
-    solve(0); // 空の盤面から始めると必ずtrueになる
-    return grid;
+    for (const num of candidates) {
+      if (isValid(grid, row, col, num)) {
+        grid[row][col] = num;
+        if (solve(pos + 1)) return true;
+        grid[row][col] = 0; // バックトラック
+      }
+    }
+    return false;
+  };
+  solve(0); // 空の盤面から始めると必ずtrueになる
+  return grid;
 };
 
 /**
@@ -101,33 +99,37 @@ export const generateNumberPlace = (): number[][] => {
  * @param {{ value: number }} count - 解の数を保持する参照用オブジェクト
  * @returns {number} 盤面の解の数（最大2）
  */
-export const countSolutions = (grid: number[][], pos: number = 0, count = { value: 0 }): number => {
-    // 81マスすべてを埋め終わった場合、解が1つ見つかったとしてカウント
-    if (pos === 81) {
-        count.value++;
-        return count.value;
-    }
-    const row = Math.floor(pos / 9);
-    const col = pos % 9;
-
-    // すでに数字が入っているマスはスキップして次のマスへ
-    if (grid[row][col] !== 0) {
-        return countSolutions(grid, pos + 1, count);
-    }
-
-    // 空白マスに対して1〜9の数字を順に試す
-    for (let num = 1; num <= 9; num++) {
-        // 処理の最適化のため、すでに2つの解が見つかっている場合は探索を打ち切る
-        if (count.value >= 2) break;
-
-        if (isValid(grid, row, col, num)) {
-            grid[row][col] = num; // 数字を仮置き
-            countSolutions(grid, pos + 1, count); // 次のマスを再帰的に探索
-            grid[row][col] = 0; // バックトラック（元に戻して次の数字を試す）
-        }
-    }
+export const countSolutions = (
+  grid: number[][],
+  pos: number = 0,
+  count = { value: 0 },
+): number => {
+  // 81マスすべてを埋め終わった場合、解が1つ見つかったとしてカウント
+  if (pos === 81) {
+    count.value++;
     return count.value;
-}
+  }
+  const row = Math.floor(pos / 9);
+  const col = pos % 9;
+
+  // すでに数字が入っているマスはスキップして次のマスへ
+  if (grid[row][col] !== 0) {
+    return countSolutions(grid, pos + 1, count);
+  }
+
+  // 空白マスに対して1〜9の数字を順に試す
+  for (let num = 1; num <= 9; num++) {
+    // 処理の最適化のため、すでに2つの解が見つかっている場合は探索を打ち切る
+    if (count.value >= 2) break;
+
+    if (isValid(grid, row, col, num)) {
+      grid[row][col] = num; // 数字を仮置き
+      countSolutions(grid, pos + 1, count); // 次のマスを再帰的に探索
+      grid[row][col] = 0; // バックトラック（元に戻して次の数字を試す）
+    }
+  }
+  return count.value;
+};
 
 // レベルの型を定義
 export type Level = "easy" | "medium" | "hard" | "debug";
@@ -142,17 +144,17 @@ export type Level = "easy" | "medium" | "hard" | "debug";
  * @returns {number} 消去するマスの数
  */
 export const selectLevel = (level: Level): number => {
-    switch (level) {
-        case "easy":
-            return Math.floor(Math.random() * 10) + 40;
-        case "medium":
-            return Math.floor(Math.random() * 5) + 50;
-        case "hard":
-            return 60;
-        case "debug":
-            return Math.floor(Math.random() * 10) + 1;
-    }
-}
+  switch (level) {
+    case "easy":
+      return Math.floor(Math.random() * 10) + 40;
+    case "medium":
+      return Math.floor(Math.random() * 5) + 50;
+    case "hard":
+      return 60;
+    case "debug":
+      return Math.floor(Math.random() * 10) + 1;
+  }
+};
 
 /**
  * 問題生成：完成盤面からマスを消していく
@@ -162,35 +164,38 @@ export const selectLevel = (level: Level): number => {
  * @param {number} blanks - 消すマスの最大値 (デフォルト: 40)
  * @returns {number[][]} 生成された数独問題
  */
-export const generatePuzzle = (solvedGrid: number[][], blanks: number = 40): number[][] => {
-    // 元の盤面に影響を与えないよう、新しく盤面をコピー
-    const grid = solvedGrid.map(row => [...row]);
-    // どの順番でマスを消していくかをランダムにするため、0〜80の位置番号をシャッフル
-    const positions = shuffled(Array.from({ length: 81 }, (_, i) => i));
-    let removed = 0; // 実際に空白にしたマスの数
+export const generatePuzzle = (
+  solvedGrid: number[][],
+  blanks: number = 40,
+): number[][] => {
+  // 元の盤面に影響を与えないよう、新しく盤面をコピー
+  const grid = solvedGrid.map((row) => [...row]);
+  // どの順番でマスを消していくかをランダムにするため、0〜80の位置番号をシャッフル
+  const positions = shuffled(Array.from({ length: 81 }, (_, i) => i));
+  let removed = 0; // 実際に空白にしたマスの数
 
-    for (const pos of positions) {
-        if (removed >= blanks) break; // 指定した数のマスを消し終わったら終了
+  for (const pos of positions) {
+    if (removed >= blanks) break; // 指定した数のマスを消し終わったら終了
 
-        const row = Math.floor(pos / 9);
-        const col = pos % 9;
+    const row = Math.floor(pos / 9);
+    const col = pos % 9;
 
-        // 消すマスの数字を後で戻せるように一時退避
-        const backup = grid[row][col];
-        grid[row][col] = 0; // マスを空白(0)にする
+    // 消すマスの数字を後で戻せるように一時退避
+    const backup = grid[row][col];
+    grid[row][col] = 0; // マスを空白(0)にする
 
-        // そのマスを空白にした盤面のコピーを探索に渡し、解がいくつあるか調べる
-        if (countSolutions(grid.map(r => [...r])) === 1) {
-            // 解が1つの場合（問題が成立する）、そのまま空白にして消した数をカウントアップ
-            removed++;
-        } else {
-            // 解が2つ以上になる場合、一意な解答にならなくなるため数字を元に戻す
-            grid[row][col] = backup;
-        }
+    // そのマスを空白にした盤面のコピーを探索に渡し、解がいくつあるか調べる
+    if (countSolutions(grid.map((r) => [...r])) === 1) {
+      // 解が1つの場合（問題が成立する）、そのまま空白にして消した数をカウントアップ
+      removed++;
+    } else {
+      // 解が2つ以上になる場合、一意な解答にならなくなるため数字を元に戻す
+      grid[row][col] = backup;
     }
+  }
 
-    return grid;
-}
+  return grid;
+};
 
 /**
  * 2つの数独盤面が等しいかどうかを判定する
@@ -198,12 +203,13 @@ export const generatePuzzle = (solvedGrid: number[][], blanks: number = 40): num
  * @param grid2 2つ目の数独盤面
  * @returns 2つの盤面が等しい場合は true、そうでない場合は false
  */
-export const areGridsEqual = (grid1: number[][], grid2: number[][]): boolean => {
-    if (grid1.length !== grid2.length) return false;
-    return grid1.every((row, i) => {
-        if (row.length !== grid2[i].length) return false;
-        return row.every((cell, j) => cell === grid2[i][j]);
-    });
-}
-
-
+export const areGridsEqual = (
+  grid1: number[][],
+  grid2: number[][],
+): boolean => {
+  if (grid1.length !== grid2.length) return false;
+  return grid1.every((row, i) => {
+    if (row.length !== grid2[i].length) return false;
+    return row.every((cell, j) => cell === grid2[i][j]);
+  });
+};
