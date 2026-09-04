@@ -65,24 +65,7 @@ export const useSudoku = () => {
       const newMatrix = matrix.map((row) => [...row]); // 盤面ステートをコピー
       newMatrix[selectedRow][selectedCol] = value; // 選択したマスに取得した数字を入れる
       setMatrix(newMatrix);
-      // // メモ数字のマトリックスをコピー
-      // const newMemos = memos.map((row) => row.map((cell) => new Set(cell)));
-      // // 選択したマスのメモ数字をクリアする
-      // newMemos[selectedRow][selectedCol] = new Set();
-      // // 同じ行にある同じメモ数字を消す
-      // newMemos[selectedRow].forEach((cell) => cell.delete(value));
-      // // 同じ列にある同じメモ数字を消す
-      // newMemos.forEach((row) => row[selectedCol].delete(value));
-
-      // // 3×3ブロック内の同じメモ数字を消す
-      // const blockRowStart = Math.floor(selectedRow / 3) * 3;
-      // const blockColStart = Math.floor(selectedCol / 3) * 3;
-      // for (let r = blockRowStart; r < blockRowStart + 3; r++) {
-      //   for (let c = blockColStart; c < blockColStart + 3; c++) {
-      //     newMemos[r][c].delete(value);
-      //   }
-      // }
-      // 選択セルと同じ行、列、ブロックにあるメモ数字を削除する関数
+      // 選択セルに数字を置いた後、関連するメモ数字を消した新しいメモ配列を返す
       const newMemos = clearMemosAfterPlacement(
         memos,
         selectedRow,
@@ -125,10 +108,6 @@ export const useSudoku = () => {
       } else {
         cellMemos.add(value);
       }
-      // newMemos[selectedRow][selectedCol].has(value)
-      //   ? newMemos[selectedCell[0]][selectedCell[1]].delete(value)
-      //   : newMemos[selectedCell[0]][selectedCell[1]].add(value);
-      // console.log(newMemos);
       setMemos(newMemos);
     }
   };

@@ -11,7 +11,6 @@ type NumberPadProps = {
   handleStartNewGame: () => void;
   isMemoMode: boolean;
   onToggleMemoMode: () => void;
-  // setIsMemoMode: React.Dispatch<React.SetStateAction<boolean>>;
   onClickMemoNumber: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
@@ -23,7 +22,6 @@ export const NumberPad = ({
   handleStartNewGame,
   isMemoMode,
   onToggleMemoMode,
-  // setIsMemoMode,
   onClickMemoNumber,
 }: NumberPadProps) => {
   return (
