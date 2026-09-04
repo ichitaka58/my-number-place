@@ -216,7 +216,6 @@ const Home = () => {
                     ${!isRunning ? "opacity-20" : ""}
                   `}
                 >
-                  {/* {cell !== 0 ? cell : ""} */}
                   {cell !== 0 ? (
                     cell
                   ) : (
@@ -259,7 +258,6 @@ const Home = () => {
         handleStartNewGame={handleStartNewGame}
         isMemoMode={isMemoMode}
         onToggleMemoMode={onToggleMemoMode}
-        // setIsMemoMode={setIsMemoMode}
         onClickMemoNumber={onClickMemoNumber}
       />
 
