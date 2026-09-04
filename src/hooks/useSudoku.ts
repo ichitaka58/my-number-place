@@ -6,6 +6,7 @@ import {
   generatePuzzle,
   areGridsEqual,
   type Level,
+  clearMemosAfterPlacement,
 } from "../utils/sudokuLogic";
 
 export const useSudoku = () => {
@@ -21,6 +22,14 @@ export const useSudoku = () => {
   const [solvedBoard, setSolvedBoard] = useState<number[][]>(createEmptyGrid);
   // 完成したかどうかを保持するステート
   const [completed, setCompleted] = useState<boolean>(false);
+
+  // memosの初期値 9×9のマスにSet{}が入る
+  const createEmptyMemos = (): Set<number>[][] =>
+    Array.from({ length: 9 }, () =>
+      Array.from({ length: 9 }, () => new Set<number>()),
+    );
+  // 仮置きのメモ数字を管理するステート
+  const [memos, setMemos] = useState<Set<number>[][]>(createEmptyMemos);
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
@@ -39,6 +48,8 @@ export const useSudoku = () => {
     setInitialBoard(puzzle.map((row) => [...row]));
     // 問題盤面を現在の盤面として設定する
     setMatrix(puzzle);
+    // メモ数字も初期化する
+    setMemos(createEmptyMemos);
   };
 
   /**
@@ -48,10 +59,38 @@ export const useSudoku = () => {
    */
   const onClickNumberButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (selectedCell.length === 2) {
-      const value = Number(e.currentTarget.innerText);
-      const newMatrix = matrix.map((row) => [...row]);
-      newMatrix[selectedCell[0]][selectedCell[1]] = value;
+      const selectedRow: number = selectedCell[0]; // 選択したセルの行インデックス
+      const selectedCol: number = selectedCell[1]; // 選択したセルの列インデックス
+      const value = Number(e.currentTarget.innerText); // NumberPadで選択した数字を取得
+      const newMatrix = matrix.map((row) => [...row]); // 盤面ステートをコピー
+      newMatrix[selectedRow][selectedCol] = value; // 選択したマスに取得した数字を入れる
       setMatrix(newMatrix);
+      // // メモ数字のマトリックスをコピー
+      // const newMemos = memos.map((row) => row.map((cell) => new Set(cell)));
+      // // 選択したマスのメモ数字をクリアする
+      // newMemos[selectedRow][selectedCol] = new Set();
+      // // 同じ行にある同じメモ数字を消す
+      // newMemos[selectedRow].forEach((cell) => cell.delete(value));
+      // // 同じ列にある同じメモ数字を消す
+      // newMemos.forEach((row) => row[selectedCol].delete(value));
+
+      // // 3×3ブロック内の同じメモ数字を消す
+      // const blockRowStart = Math.floor(selectedRow / 3) * 3;
+      // const blockColStart = Math.floor(selectedCol / 3) * 3;
+      // for (let r = blockRowStart; r < blockRowStart + 3; r++) {
+      //   for (let c = blockColStart; c < blockColStart + 3; c++) {
+      //     newMemos[r][c].delete(value);
+      //   }
+      // }
+      // 選択セルと同じ行、列、ブロックにあるメモ数字を削除する関数
+      const newMemos = clearMemosAfterPlacement(
+        memos,
+        selectedRow,
+        selectedCol,
+        value,
+      );
+      setMemos(newMemos);
+      // 盤面が正解盤面と等しければ、completed = true;
       if (areGridsEqual(newMatrix, solvedBoard)) {
         setCompleted(true);
       }
@@ -70,6 +109,30 @@ export const useSudoku = () => {
     }
   };
 
+  /**
+   * メモモードONの時、選択セルのメモ数字を追加／削除する
+   */
+  const onClickMemoNumber = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (selectedCell.length === 2) {
+      const selectedRow: number = selectedCell[0]; // 選択したセルの行インデックス
+      const selectedCol: number = selectedCell[1]; // 選択したセルの列インデックス
+      if (matrix[selectedRow][selectedCol] !== 0) return;
+      const value = Number(e.currentTarget.innerText);
+      const newMemos = memos.map((row) => row.map((cell) => new Set(cell)));
+      const cellMemos = newMemos[selectedRow][selectedCol];
+      if (cellMemos.has(value)) {
+        cellMemos.delete(value);
+      } else {
+        cellMemos.add(value);
+      }
+      // newMemos[selectedRow][selectedCol].has(value)
+      //   ? newMemos[selectedCell[0]][selectedCell[1]].delete(value)
+      //   : newMemos[selectedCell[0]][selectedCell[1]].add(value);
+      // console.log(newMemos);
+      setMemos(newMemos);
+    }
+  };
+
   return {
     matrix,
     initialBoard,
@@ -77,10 +140,12 @@ export const useSudoku = () => {
     level,
     solvedBoard,
     completed,
+    memos,
     setLevel,
     setSelectedCell,
     handleGenerate,
     onClickNumberButton,
     onClickCancelButton,
+    onClickMemoNumber,
   };
 };

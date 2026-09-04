@@ -17,6 +17,7 @@ import { BottomNavigation } from "../components/BottomNavigation";
 import { NumberPad } from "../components/NumberPad";
 import { GameHeader } from "../components/GameHeader";
 import { TimerAndLevel } from "../components/TimerAndLevel";
+import { NUMBERS } from "../utils/sudokuLogic";
 
 const Home = () => {
   const {
@@ -27,9 +28,11 @@ const Home = () => {
     setLevel,
     setSelectedCell,
     completed,
+    memos,
     handleGenerate,
     onClickNumberButton,
     onClickCancelButton,
+    onClickMemoNumber,
   } = useSudoku();
   const [windowWidth, windowHeight] = useWindowSize();
   // タイマー（<Timer />）をリセットするための識別用キー（New Gameが押されるたびにカウントアップし秒数を0に戻す）
@@ -40,6 +43,8 @@ const Home = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>("");
+  // メモモードがオンかオフかを管理するステート
+  const [isMemoMode, setIsMemoMode] = useState<boolean>(false);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
   const selectedRow = selectedCell[0];
@@ -69,6 +74,13 @@ const Home = () => {
     handleGenerate();
     setIsRunning(true);
     setGameId((prev) => prev + 1);
+  };
+
+  /**
+   * メモモードを切り替える関数
+   */
+  const onToggleMemoMode = () => {
+    setIsMemoMode((prev) => !prev);
   };
 
   if (!isStarted) {
@@ -204,7 +216,21 @@ const Home = () => {
                     ${!isRunning ? "opacity-20" : ""}
                   `}
                 >
-                  {cell !== 0 ? cell : ""}
+                  {/* {cell !== 0 ? cell : ""} */}
+                  {cell !== 0 ? (
+                    cell
+                  ) : (
+                    <div className="grid grid-rows-3 grid-cols-3 p-0.5 w-full h-full text-[8px] place-items-center">
+                      {NUMBERS.map((n) => (
+                        <span
+                          key={n}
+                          className={`${memos[rowIndex][cellIndex].has(n) ? "opacity-100" : "opacity-0"}`}
+                        >
+                          {n}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             }),
@@ -231,6 +257,10 @@ const Home = () => {
         completed={completed}
         isRunning={isRunning}
         handleStartNewGame={handleStartNewGame}
+        isMemoMode={isMemoMode}
+        onToggleMemoMode={onToggleMemoMode}
+        // setIsMemoMode={setIsMemoMode}
+        onClickMemoNumber={onClickMemoNumber}
       />
 
       {/* Bottom Navigation Bar */}
