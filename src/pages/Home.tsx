@@ -18,6 +18,7 @@ import { NumberPad } from "../components/NumberPad";
 import { GameHeader } from "../components/GameHeader";
 import { TimerAndLevel } from "../components/TimerAndLevel";
 import { NUMBERS } from "../utils/sudokuLogic";
+import GameControls from "../components/GameControls";
 
 const Home = () => {
   const {
@@ -82,6 +83,16 @@ const Home = () => {
   const onToggleMemoMode = () => {
     setIsMemoMode((prev) => !prev);
   };
+
+  /**
+   * ゲームを一時保存する関数
+   */
+  const handleSaveGame = ()=> {
+    localStorage.setItem("currentMatrix" + gameId, JSON.stringify(matrix));
+    const arrayMemos = memos.map((r) => r.map((cell) => [...new Set(cell)]));
+    console.log(arrayMemos);
+    localStorage.setItem("currentMemos" + gameId, JSON.stringify(arrayMemos));
+  }
 
   if (!isStarted) {
     return (
@@ -249,17 +260,26 @@ const Home = () => {
         )}
       </div>
 
-      {/* Number Pad Area */}
-      <NumberPad
-        onClickNumberButton={onClickNumberButton}
-        onClickCancelButton={onClickCancelButton}
-        completed={completed}
-        isRunning={isRunning}
-        handleStartNewGame={handleStartNewGame}
-        isMemoMode={isMemoMode}
-        onToggleMemoMode={onToggleMemoMode}
-        onClickMemoNumber={onClickMemoNumber}
-      />
+      <div className="w-full max-w-120 mt-6 flex flex-col gap-2 sm:gap-2">
+        {/* Number Pad Area */}
+        <NumberPad
+          onClickNumberButton={onClickNumberButton}
+          completed={completed}
+          isRunning={isRunning}
+          isMemoMode={isMemoMode}
+          onClickMemoNumber={onClickMemoNumber}
+        />
+        {/* ゲームコントロールボタン */}
+        <GameControls
+          onClickCancelButton={onClickCancelButton}
+          completed={completed}
+          isRunning={isRunning}
+          isMemoMode={isMemoMode}
+          onToggleMemoMode={onToggleMemoMode}
+          handleStartNewGame={handleStartNewGame}
+          onClickSaveButton={handleSaveGame}
+        />
+      </div>
 
       {/* Bottom Navigation Bar */}
       <BottomNavigation />
