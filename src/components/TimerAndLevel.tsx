@@ -16,6 +16,9 @@ type TimerAndLevelProps = {
   userName: string;
   level: Level;
   setLevel: React.Dispatch<React.SetStateAction<Level>>;
+  saveButtonClicked: boolean;
+  setSaveButtonClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  savedTime: string | null;
 };
 
 /**
@@ -29,8 +32,11 @@ export const TimerAndLevel = ({
   userName,
   level,
   setLevel,
+  saveButtonClicked,
+  setSaveButtonClicked,
+  savedTime,
 }: TimerAndLevelProps) => {
-  const { displayTimer, seconds } = useTimer(isRunning);
+  const { displayTimer, seconds } = useTimer(isRunning, savedTime);
 
   // ゲームクリア時にタイマーを停止し、クリア結果をサーバーに保存する
   useEffect(() => {
@@ -41,9 +47,17 @@ export const TimerAndLevel = ({
     }
   }, [completed, setIsRunning]);
 
+  // 一時保存ボタンが押されたら、タイマーを保存
+  useEffect(() => {
+    if (saveButtonClicked) {
+      localStorage.setItem("timer", JSON.stringify(seconds));
+      setSaveButtonClicked(false);
+    }
+  }, [saveButtonClicked]);
+
   return (
     <div className="flex justify-center items-center max-w-120 w-full relative mb-1">
-      <LevelSelectButton level={level} setLevel={setLevel}/>
+      <LevelSelectButton level={level} setLevel={setLevel} />
       {/* タイマー表示 */}
       <div className="flex gap-1">
         <p>Timer:</p>

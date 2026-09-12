@@ -120,6 +120,8 @@ export const useSudoku = () => {
     solvedBoard,
     completed,
     memos,
+    setMatrix,
+    setMemos,
     setLevel,
     setSelectedCell,
     handleGenerate,
