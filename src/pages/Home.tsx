@@ -23,6 +23,7 @@ import GameControls from "../components/GameControls";
 const Home = () => {
   const {
     matrix,
+    setMatrix,
     initialBoard,
     selectedCell,
     level,
@@ -30,6 +31,7 @@ const Home = () => {
     setSelectedCell,
     completed,
     memos,
+    setMemos,
     handleGenerate,
     onClickNumberButton,
     onClickCancelButton,
@@ -46,6 +48,19 @@ const Home = () => {
   const [userName, setUserName] = useState<string>("");
   // メモモードがオンかオフかを管理するステート
   const [isMemoMode, setIsMemoMode] = useState<boolean>(false);
+  // 保存されたゲームがあるかどうかを管理するステート
+  const savedMatrix = localStorage.getItem("currentMatrix");
+  const savedMemos = localStorage.getItem("currentMemos");
+  const savedUserName = localStorage.getItem("userName");
+  const savedTime = localStorage.getItem("timer");
+  const hasSavedGame =
+    savedMatrix !== null &&
+    savedMemos !== null &&
+    savedUserName !== null &&
+    savedTime !== null;
+  // const [hasSavedGame, setHasSavedGame] = useState<boolean>(hasInitSavedData);
+  // タイマーを保存するタイミングを伝えるステート
+  const [saveButtonClicked, setSaveButtonClicked] = useState<boolean>(false);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
   const selectedRow = selectedCell[0];
@@ -75,6 +90,10 @@ const Home = () => {
     handleGenerate();
     setIsRunning(true);
     setGameId((prev) => prev + 1);
+    localStorage.removeItem("currentMatrix");
+    localStorage.removeItem("currentMemos");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("timer");
   };
 
   /**
@@ -87,12 +106,37 @@ const Home = () => {
   /**
    * ゲームを一時保存する関数
    */
-  const handleSaveGame = ()=> {
-    localStorage.setItem("currentMatrix" + gameId, JSON.stringify(matrix));
+  const handleSaveGame = () => {
+    setIsRunning(false); // ゲームを停止
+    // matrix、memos、userNameをlocalStorageに保存
+    localStorage.setItem("currentMatrix", JSON.stringify(matrix));
+    // Setを一度、配列にする
     const arrayMemos = memos.map((r) => r.map((cell) => [...new Set(cell)]));
-    console.log(arrayMemos);
-    localStorage.setItem("currentMemos" + gameId, JSON.stringify(arrayMemos));
-  }
+    localStorage.setItem("currentMemos", JSON.stringify(arrayMemos));
+    localStorage.setItem("userName", JSON.stringify(userName));
+    setSaveButtonClicked(true); // 保存ボタンが実行されたことをTimerに伝える
+    // TimerAndLevelコンポーネントのレンダリングを走らせるため、画面遷移を1秒遅らせる。
+    setTimeout(() => {
+      setIsStarted(false);
+    }, 1000);
+    alert("ゲームを保存しました");
+  };
+
+  // localStorageに保存したゲームを呼び出して再開する関数
+  const handleResumeGame = () => {
+    if (!hasSavedGame) return;
+
+    if (savedMatrix && savedMemos && savedUserName && savedTime) {
+      setMatrix(JSON.parse(savedMatrix));
+      const parsedSavedMemos: number[][][] = JSON.parse(savedMemos);
+      setMemos(parsedSavedMemos.map((r) => r.map((cell) => new Set(cell))));
+      setUserName(savedUserName);
+      setIsStarted(true);
+      setIsRunning(true);
+      setGameId(1); //gameIdが0のままだと"Pause"が表示されないため1をセット。
+    }
+  };
+
 
   if (!isStarted) {
     return (
@@ -110,7 +154,7 @@ const Home = () => {
               className="w-64 p-3 text-lg bg-slate-950 text-cyan-300 border-2 border-slate-600 rounded-lg placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
             />
           </div>
-          <div>
+          <div className="mb-6">
             <button
               onClick={handleStart}
               className="px-8 py-3 text-xl font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-all duration-300 border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)] hover:shadow-[0_0_15px_rgba(34,211,238,0.6)]"
@@ -118,6 +162,16 @@ const Home = () => {
               Start Game
             </button>
           </div>
+          {hasSavedGame && (
+            <div>
+              <button
+                onClick={handleResumeGame}
+                className="px-6 py-3 text-xs font-bold bg-violet-700 text-slate-200 rounded-lg hover:bg-violet-500 transition-all duration-300 border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)] hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] hover:text-white"
+              >
+                -続きから始める-
+              </button>
+            </div>
+          )}
         </div>
         <BottomNavigation />
       </div>
@@ -152,6 +206,9 @@ const Home = () => {
         userName={userName}
         level={level}
         setLevel={setLevel}
+        saveButtonClicked={saveButtonClicked}
+        setSaveButtonClicked={setSaveButtonClicked}
+        savedTime={savedTime}
       />
 
       {/* Sudoku Grid Area */}

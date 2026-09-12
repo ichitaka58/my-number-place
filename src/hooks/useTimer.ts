@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { generateDisplayTimer } from "../utils/time";
 
-export const useTimer = (isRunning: boolean) => {
-  const [seconds, setSeconds] = useState(0);
+export const useTimer = (isRunning: boolean, savedTime: string | null) => {
+  // localStorageに保存されたゲーム（Time）があれば、その時間を初期値に設定
+  const [seconds, setSeconds] = useState(savedTime === null ? 0 : Number(savedTime));
 
   useEffect(() => {
     if (!isRunning) return;
