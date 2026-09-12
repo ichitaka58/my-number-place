@@ -25,9 +25,12 @@ const Home = () => {
     matrix,
     setMatrix,
     initialBoard,
+    setInitialBoard,
     selectedCell,
     level,
     setLevel,
+    solvedBoard,
+    setSolvedBoard,
     setSelectedCell,
     completed,
     memos,
@@ -53,11 +56,15 @@ const Home = () => {
   const savedMemos = localStorage.getItem("currentMemos");
   const savedUserName = localStorage.getItem("userName");
   const savedTime = localStorage.getItem("timer");
+  const savedInitialBoard = localStorage.getItem("initialBoard");
+  const savedSolvedBoard = localStorage.getItem("solvedBoard");
   const hasSavedGame =
     savedMatrix !== null &&
     savedMemos !== null &&
     savedUserName !== null &&
-    savedTime !== null;
+    savedTime !== null &&
+    savedInitialBoard !== null &&
+    savedSolvedBoard !== null;
   // const [hasSavedGame, setHasSavedGame] = useState<boolean>(hasInitSavedData);
   // タイマーを保存するタイミングを伝えるステート
   const [saveButtonClicked, setSaveButtonClicked] = useState<boolean>(false);
@@ -74,12 +81,20 @@ const Home = () => {
    * ユーザー名入力しゲーム画面を表示する関数
    */
   const handleStart = () => {
+    setGameId(0);
+    localStorage.removeItem("currentMatrix");
+    localStorage.removeItem("currentMemos");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("timer");
+    localStorage.removeItem("initialBoard");
+    localStorage.removeItem("solvedBoard");
     // ユーザー名が未入力の場合は、デフォルトで「ゲストユーザー」を設定する
     if (!userName) {
       setUserName("ゲストユーザー");
     }
     // ゲームを開始し、ゲーム画面の表示に切り替える
     setIsStarted(true);
+    setSelectedCell([]); // 選択セルを解除
   };
 
   /**
@@ -94,6 +109,9 @@ const Home = () => {
     localStorage.removeItem("currentMemos");
     localStorage.removeItem("userName");
     localStorage.removeItem("timer");
+    localStorage.removeItem("initialBoard");
+    localStorage.removeItem("solvedBoard");
+    setSelectedCell([]); // 選択セルを解除
   };
 
   /**
@@ -114,10 +132,13 @@ const Home = () => {
     const arrayMemos = memos.map((r) => r.map((cell) => [...new Set(cell)]));
     localStorage.setItem("currentMemos", JSON.stringify(arrayMemos));
     localStorage.setItem("userName", JSON.stringify(userName));
+    localStorage.setItem("initialBoard", JSON.stringify(initialBoard)); // 最初から埋まっていた固定マスも保存
+    localStorage.setItem("solvedBoard", JSON.stringify(solvedBoard)); // 完成盤面も保存
     setSaveButtonClicked(true); // 保存ボタンが実行されたことをTimerに伝える
     // TimerAndLevelコンポーネントのレンダリングを走らせるため、画面遷移を1秒遅らせる。
     setTimeout(() => {
       setIsStarted(false);
+      setUserName("");
     }, 1000);
     alert("ゲームを保存しました");
   };
@@ -126,17 +147,25 @@ const Home = () => {
   const handleResumeGame = () => {
     if (!hasSavedGame) return;
 
-    if (savedMatrix && savedMemos && savedUserName && savedTime) {
+    if (
+      savedMatrix &&
+      savedMemos &&
+      savedUserName &&
+      savedTime &&
+      savedInitialBoard &&
+      savedSolvedBoard
+    ) {
       setMatrix(JSON.parse(savedMatrix));
       const parsedSavedMemos: number[][][] = JSON.parse(savedMemos);
       setMemos(parsedSavedMemos.map((r) => r.map((cell) => new Set(cell))));
-      setUserName(savedUserName);
+      setUserName(JSON.parse(savedUserName));
+      setInitialBoard(JSON.parse(savedInitialBoard)); // 最初から埋まっていた固定マスも復元
+      setSolvedBoard(JSON.parse(savedSolvedBoard)); // 完成盤面も復元
       setIsStarted(true);
       setIsRunning(true);
       setGameId(1); //gameIdが0のままだと"Pause"が表示されないため1をセット。
     }
   };
-
 
   if (!isStarted) {
     return (
