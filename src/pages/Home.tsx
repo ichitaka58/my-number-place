@@ -81,6 +81,9 @@ const Home = () => {
    * ユーザー名入力しゲーム画面を表示する関数
    */
   const handleStart = () => {
+    if (hasSavedGame) {
+      if (!window.confirm("新しいゲームを始めてよろしいですか？")) return;
+    }
     setGameId(0);
     localStorage.removeItem("currentMatrix");
     localStorage.removeItem("currentMemos");
@@ -102,6 +105,9 @@ const Home = () => {
    * 盤面の事前生成処理を利用し、ゲーム回数（gameId）を進めることでTimerコンポーネントを初期化させます。
    */
   const handleStartNewGame = () => {
+    if (hasSavedGame) {
+      if (!window.confirm("新しいゲームを始めてよろしいですか？")) return;
+    }
     handleGenerate();
     setIsRunning(true);
     setGameId((prev) => prev + 1);
