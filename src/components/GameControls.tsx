@@ -9,7 +9,7 @@ type GameControlsProps = {
   isRunning: boolean;
   onToggleMemoMode: () => void;
   isMemoMode: boolean;
-  handleStartNewGame: () => void;
+  handleNewGameClick: () => void;
   onClickSaveButton: () => void;
 };
 
@@ -19,7 +19,7 @@ const GameControls = ({
   isRunning,
   onToggleMemoMode,
   isMemoMode,
-  handleStartNewGame,
+  handleNewGameClick,
   onClickSaveButton,
 }: GameControlsProps) => {
   return (
@@ -49,7 +49,7 @@ const GameControls = ({
       </button>
       {/* New Game ボタン */}
       <button
-        onClick={handleStartNewGame}
+        onClick={handleNewGameClick}
         className="cursor-pointer hover:scale-105 text-slate-500 hover:text-slate-200 hover:-translate-y-0.5 active:translate-y-0 transition-all text-2xl flex flex-col items-center justify-center"
       >
         <VscNewFile />
