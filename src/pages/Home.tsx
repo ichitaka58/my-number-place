@@ -19,6 +19,7 @@ import { GameHeader } from "../components/GameHeader";
 import { TimerAndLevel } from "../components/TimerAndLevel";
 import { NUMBERS } from "../utils/sudokuLogic";
 import GameControls from "../components/GameControls";
+import ConfirmNewGameDialog from "../components/ConfirmNewGameDialog";
 
 const Home = () => {
   const {
@@ -68,6 +69,8 @@ const Home = () => {
   // const [hasSavedGame, setHasSavedGame] = useState<boolean>(hasInitSavedData);
   // タイマーを保存するタイミングを伝えるステート
   const [saveButtonClicked, setSaveButtonClicked] = useState<boolean>(false);
+  // 確認ダイアログの開閉を管理するステート
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
   const selectedRow = selectedCell[0];
@@ -80,10 +83,7 @@ const Home = () => {
   /**
    * ユーザー名入力しゲーム画面を表示する関数
    */
-  const handleStart = () => {
-    if (hasSavedGame) {
-      if (!window.confirm("新しいゲームを始めてよろしいですか？")) return;
-    }
+  const startGame = () => {
     setGameId(0);
     localStorage.removeItem("currentMatrix");
     localStorage.removeItem("currentMemos");
@@ -101,13 +101,21 @@ const Home = () => {
   };
 
   /**
+   * ゲームスタートボタンクリック時に確認ダイアログを開く処理
+   */
+  const handleStartClick = () => {
+    if (hasSavedGame) {
+      setConfirmOpen(true);
+    } else {
+      startGame();
+    }
+  };
+
+  /**
    * 新しいゲームを開始するハンドラー関数
    * 盤面の事前生成処理を利用し、ゲーム回数（gameId）を進めることでTimerコンポーネントを初期化させます。
    */
-  const handleStartNewGame = () => {
-    if (hasSavedGame) {
-      if (!window.confirm("新しいゲームを始めてよろしいですか？")) return;
-    }
+  const startNewGame = () => {
     handleGenerate();
     setIsRunning(true);
     setGameId((prev) => prev + 1);
@@ -118,6 +126,17 @@ const Home = () => {
     localStorage.removeItem("initialBoard");
     localStorage.removeItem("solvedBoard");
     setSelectedCell([]); // 選択セルを解除
+  };
+
+  /**
+   * New Gameボタンをクリックして確認ダイアログを開く
+   */
+  const handleNewGameClick = () => {
+    if (hasSavedGame) {
+      setConfirmOpen(true);
+    } else {
+      startNewGame();
+    }
   };
 
   /**
@@ -191,7 +210,7 @@ const Home = () => {
           </div>
           <div className="mb-6">
             <button
-              onClick={handleStart}
+              onClick={handleStartClick}
               className="px-8 py-3 text-xl font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-all duration-300 border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)] hover:shadow-[0_0_15px_rgba(34,211,238,0.6)]"
             >
               Start Game
@@ -209,6 +228,15 @@ const Home = () => {
           )}
         </div>
         <BottomNavigation />
+        {/* 確認ダイアログ */}
+        <ConfirmNewGameDialog
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={() => {
+            setConfirmOpen(false);
+            startGame();
+          }}
+        />
       </div>
     );
   }
@@ -368,13 +396,22 @@ const Home = () => {
           isRunning={isRunning}
           isMemoMode={isMemoMode}
           onToggleMemoMode={onToggleMemoMode}
-          handleStartNewGame={handleStartNewGame}
+          handleNewGameClick={handleNewGameClick}
           onClickSaveButton={handleSaveGame}
         />
       </div>
 
       {/* Bottom Navigation Bar */}
       <BottomNavigation />
+
+      <ConfirmNewGameDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          startNewGame();
+        }}
+      />
     </div>
   );
 };
