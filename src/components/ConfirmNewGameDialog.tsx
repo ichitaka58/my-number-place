@@ -17,27 +17,25 @@ const ConfirmNewGameDialog = ({
   onConfirm,
 }: ConfirmNewGameDialogProps) => {
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        aria-labelledby="confirm-dialog-title"
-        aria-describedby="confirm-dialog-description"
-      >
-        <DialogTitle id="confirm-dialog-title">
-          新しいゲームを始めてよろしいですか？
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-dialog-description">
-            このまま実行すると、保存しているゲームは削除されます。
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>キャンセル</Button>
-          <Button onClick={onConfirm}>OK</Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-description"
+    >
+      <DialogTitle id="confirm-dialog-title">
+        新しいゲームを始めてよろしいですか？
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="confirm-dialog-description">
+          このまま実行すると、保存しているゲームは削除されます。
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>キャンセル</Button>
+        <Button onClick={onConfirm}>OK</Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
