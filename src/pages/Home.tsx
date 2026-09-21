@@ -20,6 +20,7 @@ import { TimerAndLevel } from "../components/TimerAndLevel";
 import { NUMBERS } from "../utils/sudokuLogic";
 import GameControls from "../components/GameControls";
 import ConfirmNewGameDialog from "../components/ConfirmNewGameDialog";
+import ConfirmSaveGameDialog from "../components/ConfirmSaveGameDialog";
 
 const Home = () => {
   const {
@@ -69,8 +70,11 @@ const Home = () => {
   // const [hasSavedGame, setHasSavedGame] = useState<boolean>(hasInitSavedData);
   // タイマーを保存するタイミングを伝えるステート
   const [saveButtonClicked, setSaveButtonClicked] = useState<boolean>(false);
-  // 確認ダイアログの開閉を管理するステート
-  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+  // new gameを始めて良いか確認ダイアログの開閉を管理するステート
+  const [newGameConfirmOpen, setNewGameConfirmOpen] = useState<boolean>(false);
+  // ゲーム保存の確認ダイアログ開閉を管理するステート
+  const [saveGameConfirmOpen, setSaveGameConfirmOpen] =
+    useState<boolean>(false);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
   const selectedRow = selectedCell[0];
@@ -105,7 +109,7 @@ const Home = () => {
    */
   const handleStartClick = () => {
     if (hasSavedGame) {
-      setConfirmOpen(true);
+      setNewGameConfirmOpen(true);
     } else {
       startGame();
     }
@@ -133,7 +137,7 @@ const Home = () => {
    */
   const handleNewGameClick = () => {
     if (hasSavedGame) {
-      setConfirmOpen(true);
+      setNewGameConfirmOpen(true);
     } else {
       startNewGame();
     }
@@ -160,12 +164,7 @@ const Home = () => {
     localStorage.setItem("initialBoard", JSON.stringify(initialBoard)); // 最初から埋まっていた固定マスも保存
     localStorage.setItem("solvedBoard", JSON.stringify(solvedBoard)); // 完成盤面も保存
     setSaveButtonClicked(true); // 保存ボタンが実行されたことをTimerに伝える
-    // TimerAndLevelコンポーネントのレンダリングを走らせるため、画面遷移を1秒遅らせる。
-    setTimeout(() => {
-      setIsStarted(false);
-      setUserName("");
-    }, 1000);
-    alert("ゲームを保存しました");
+    setSaveGameConfirmOpen(true);
   };
 
   // localStorageに保存したゲームを呼び出して再開する関数
@@ -230,10 +229,10 @@ const Home = () => {
         <BottomNavigation />
         {/* 確認ダイアログ */}
         <ConfirmNewGameDialog
-          open={confirmOpen}
-          onClose={() => setConfirmOpen(false)}
+          open={newGameConfirmOpen}
+          onClose={() => setNewGameConfirmOpen(false)}
           onConfirm={() => {
-            setConfirmOpen(false);
+            setNewGameConfirmOpen(false);
             startGame();
           }}
         />
@@ -367,7 +366,7 @@ const Home = () => {
           )}
         </div>
         {/* Pause Action */}
-        {gameId > 0 && !isRunning && (
+        {gameId > 0 && !isRunning && !saveGameConfirmOpen && (
           <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
             ⏸️ Pause!
           </p>
@@ -403,13 +402,22 @@ const Home = () => {
 
       {/* Bottom Navigation Bar */}
       <BottomNavigation />
-
+      {/* 新しいゲーム開始の確認ダイアログ */}
       <ConfirmNewGameDialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
+        open={newGameConfirmOpen}
+        onClose={() => setNewGameConfirmOpen(false)}
         onConfirm={() => {
-          setConfirmOpen(false);
+          setNewGameConfirmOpen(false);
           startNewGame();
+        }}
+      />
+      {/* ゲーム保存の確認ダイアログ */}
+      <ConfirmSaveGameDialog
+        open={saveGameConfirmOpen}
+        onConfirm={() => {
+          setIsStarted(false);
+          setUserName("");
+          setSaveGameConfirmOpen(false);
         }}
       />
     </div>
