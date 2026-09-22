@@ -12,6 +12,10 @@ const Result = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>("easy");
   // データ取得中かどうかのローディング状態
   const [loading, setLoading] = useState<boolean>(false);
+  // 成績取得失敗時のエラーメッセージ
+  const [error, setError] = useState<string | null>(null);
+  // 成績取得失敗時の再試行をクリックしてuseEffectにより再取得を走らせるキー
+  const [reloadKey, setReloadKey] = useState<number>(0);
 
   // 難易度切り替えボタンの定義（[値, 表示名] の形式）
   const LEVEL_OPTIONS: [string, string][] = [
@@ -38,16 +42,19 @@ const Result = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true); // ローディング開始
-      const data = await fetchResults();
-      if (data) {
-        // APIから取得したデータを選択中の難易度でフィルタリングする
-        const filteredRecords = data.filter((r) => r.level === selectedLevel);
-        setRecords(filteredRecords);
+      setError(null); // 再試行時に前回のエラーを消す
+      try {
+        const data = await fetchResults();
+        setRecords(data.filter((r) => r.level === selectedLevel));
+      } catch {
+        setError("成績の取得に失敗しました");
+        setRecords([]); // 古い一覧を残さない
+      } finally {
+        setLoading(false); // ローディング終了
       }
-      setLoading(false); // ローディング終了
     };
     loadData();
-  }, [selectedLevel]);
+  }, [selectedLevel, reloadKey]);
 
   // 削除ボタンクリック時の処理
   // DB削除が成功した場合のみstateを更新し、UIとDBの整合性を保つ
@@ -84,8 +91,20 @@ const Result = () => {
         </div>
         <ul className="space-y-2">
           {loading ? (
-            /* ローディング中はスピナーを表示 */
-            <CircularProgress aria-label="Loading..." className="mt-8" />
+            <li>
+              {/* ローディング中はスピナーを表示 */}
+              <CircularProgress aria-label="Loading..." className="mt-8" />
+            </li>
+          ) : error ? (
+            <li role="alert" className="text-sm text-red-500 mt-8">
+              <p>{error}</p>
+              <button
+                onClick={() => setReloadKey((prev) => prev + 1)}
+                className="mt-2 px-4 py-1 rounded-lg bg-slate-700 hover:cursor-pointer hover:text-red-600 hover:bg-slate-800"
+              >
+                再試行
+              </button>
+            </li>
           ) : records.length === 0 ? (
             /* データが存在しない場合のメッセージ */
             <li className="text-sm mt-8">データがありません</li>
@@ -107,7 +126,7 @@ const Result = () => {
                 </div>
                 {selectedItemId === record.id && (
                   <button
-                    onClick={(e) => handleDeleteRecord(e,record.id)}
+                    onClick={(e) => handleDeleteRecord(e, record.id)}
                     className="bg-red-500 text-slate-300 text-sm px-2 h-6 animate-slide-in-right [box-shadow:0_0_10px_rgba(239,68,68,0.8)]"
                   >
                     削除
