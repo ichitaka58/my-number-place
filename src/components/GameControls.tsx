@@ -2,6 +2,7 @@ import { CiEraser } from "react-icons/ci";
 import { LuSquarePen } from "react-icons/lu";
 import { MdSaveAlt } from "react-icons/md";
 import { VscNewFile } from "react-icons/vsc";
+import { FaUndo } from "react-icons/fa";
 
 type GameControlsProps = {
   onClickCancelButton: () => void;
@@ -11,6 +12,8 @@ type GameControlsProps = {
   isMemoMode: boolean;
   handleNewGameClick: () => void;
   onClickSaveButton: () => void;
+  onClickUndoButton: () => void;
+  canUndo: boolean;
 };
 
 const GameControls = ({
@@ -21,6 +24,8 @@ const GameControls = ({
   isMemoMode,
   handleNewGameClick,
   onClickSaveButton,
+  onClickUndoButton,
+  canUndo,
 }: GameControlsProps) => {
   return (
     <div className="flex justify-center mt-2 gap-10">
@@ -32,6 +37,15 @@ const GameControls = ({
       >
         <CiEraser />
         <span className="text-xs">取消</span>
+      </button>
+      {/* undoボタン */}
+      <button
+        onClick={onClickUndoButton}
+        disabled={completed || !isRunning || !canUndo}
+        className="cursor-pointer hover:scale-105 text-slate-500 hover:text-slate-200 hover:-translate-y-0.5 active:translate-y-0 transition-all text-2xl flex flex-col items-center justify-center disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+      >
+        <FaUndo />
+        <span className="text-[11px]">元に戻す</span>
       </button>
       {/* メモボタン */}
       <button

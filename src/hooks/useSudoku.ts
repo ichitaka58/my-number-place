@@ -30,12 +30,17 @@ export const useSudoku = () => {
     );
   // 仮置きのメモ数字を管理するステート
   const [memos, setMemos] = useState<Set<number>[][]>(createEmptyMemos);
+  // 手の履歴を管理するステート
+  const [history, setHistory] = useState<
+    { matrix: number[][]; memos: Set<number>[][] }[]
+  >([]);
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
   const handleGenerate = () => {
     setCompleted(false);
     setSelectedCell([]);
+    setHistory([]); // 手の履歴をクリアする
     // 選択した問題のレベルに応じて、盤面から消すマスの数を決定する
     const blanks = selectLevel(level);
     // 完成盤面を生成する
@@ -59,6 +64,8 @@ export const useSudoku = () => {
    */
   const onClickNumberButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (selectedCell.length === 2) {
+      // 今の状態のmatrix、memosを履歴に保存する
+      setHistory((prev) => [...prev, { matrix, memos }]);
       const selectedRow: number = selectedCell[0]; // 選択したセルの行インデックス
       const selectedCol: number = selectedCell[1]; // 選択したセルの列インデックス
       const value = Number(e.currentTarget.innerText); // NumberPadで選択した数字を取得
@@ -112,6 +119,26 @@ export const useSudoku = () => {
     }
   };
 
+  /**
+   * 手を元に戻す
+   */
+  const onClickUndoButton = () => {
+    if (history.length === 0) return;
+    const last = history[history.length - 1];
+    setMatrix(last.matrix);
+    setMemos(last.memos);
+    setHistory((prev) => prev.slice(0, -1));
+  };
+
+  /**
+   * 手の履歴をクリアする関数
+   * @returns void;
+   */
+  const clearHistory = () => setHistory([]);
+
+  // 履歴（元に戻せる手）があるかどうか
+  const canUndo: boolean = history.length > 0;
+
   return {
     matrix,
     initialBoard,
@@ -130,5 +157,8 @@ export const useSudoku = () => {
     onClickNumberButton,
     onClickCancelButton,
     onClickMemoNumber,
+    onClickUndoButton,
+    clearHistory,
+    canUndo,
   };
 };

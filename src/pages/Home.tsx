@@ -41,6 +41,9 @@ const Home = () => {
     onClickNumberButton,
     onClickCancelButton,
     onClickMemoNumber,
+    onClickUndoButton,
+    clearHistory,
+    canUndo,
   } = useSudoku();
   const [windowWidth, windowHeight] = useWindowSize();
   // タイマー（<Timer />）をリセットするための識別用キー（New Gameが押されるたびにカウントアップし秒数を0に戻す）
@@ -179,6 +182,7 @@ const Home = () => {
       savedInitialBoard &&
       savedSolvedBoard
     ) {
+      clearHistory(); // 手の履歴をクリア
       setMatrix(JSON.parse(savedMatrix));
       const parsedSavedMemos: number[][][] = JSON.parse(savedMemos);
       setMemos(parsedSavedMemos.map((r) => r.map((cell) => new Set(cell))));
@@ -397,6 +401,8 @@ const Home = () => {
           onToggleMemoMode={onToggleMemoMode}
           handleNewGameClick={handleNewGameClick}
           onClickSaveButton={handleSaveGame}
+          onClickUndoButton={onClickUndoButton}
+          canUndo={canUndo}
         />
       </div>
 
