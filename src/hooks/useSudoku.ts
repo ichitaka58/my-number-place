@@ -64,11 +64,13 @@ export const useSudoku = () => {
    */
   const onClickNumberButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (selectedCell.length === 2) {
-      // 今の状態のmatrix、memosを履歴に保存する
-      setHistory((prev) => [...prev, { matrix, memos }]);
       const selectedRow: number = selectedCell[0]; // 選択したセルの行インデックス
       const selectedCol: number = selectedCell[1]; // 選択したセルの列インデックス
       const value = Number(e.currentTarget.innerText); // NumberPadで選択した数字を取得
+      // 選択した数字が選択したマスにすでに入っている場合、終了
+      if (matrix[selectedRow][selectedCol] === value) return;
+      // 今の状態のmatrix、memosを履歴に保存する
+      setHistory((prev) => [...prev, { matrix, memos }]);
       const newMatrix = matrix.map((row) => [...row]); // 盤面ステートをコピー
       newMatrix[selectedRow][selectedCol] = value; // 選択したマスに取得した数字を入れる
       setMatrix(newMatrix);
@@ -93,6 +95,8 @@ export const useSudoku = () => {
    */
   const onClickCancelButton = () => {
     if (selectedCell.length === 2) {
+      if (matrix[selectedCell[0]][selectedCell[1]] === 0) return;
+      setHistory((prev) => [...prev, { matrix, memos }]);
       const newMatrix = matrix.map((row) => [...row]);
       newMatrix[selectedCell[0]][selectedCell[1]] = 0;
       setMatrix(newMatrix);
@@ -107,6 +111,7 @@ export const useSudoku = () => {
       const selectedRow: number = selectedCell[0]; // 選択したセルの行インデックス
       const selectedCol: number = selectedCell[1]; // 選択したセルの列インデックス
       if (matrix[selectedRow][selectedCol] !== 0) return;
+      setHistory((prev) => [...prev, { matrix, memos }]);
       const value = Number(e.currentTarget.innerText);
       const newMemos = memos.map((row) => row.map((cell) => new Set(cell)));
       const cellMemos = newMemos[selectedRow][selectedCol];
