@@ -1,6 +1,6 @@
 import { CiEraser } from "react-icons/ci";
 import { LuSquarePen } from "react-icons/lu";
-import { MdSaveAlt } from "react-icons/md";
+import { MdSaveAlt, MdRestartAlt } from "react-icons/md";
 import { VscNewFile } from "react-icons/vsc";
 import { FaUndo } from "react-icons/fa";
 
@@ -10,6 +10,7 @@ type GameControlsProps = {
   isRunning: boolean;
   onToggleMemoMode: () => void;
   isMemoMode: boolean;
+  handleRetryClick: () => void;
   handleNewGameClick: () => void;
   onClickSaveButton: () => void;
   onClickUndoButton: () => void;
@@ -22,6 +23,7 @@ const GameControls = ({
   isRunning,
   onToggleMemoMode,
   isMemoMode,
+  handleRetryClick,
   handleNewGameClick,
   onClickSaveButton,
   onClickUndoButton,
@@ -60,6 +62,15 @@ const GameControls = ({
           </span>
         )}
         <span className="text-xs">メモ</span>
+      </button>
+      {/* Retry ボタン */}
+      <button
+        onClick={handleRetryClick}
+        disabled={completed || !isRunning}
+        className="cursor-pointer hover:scale-105 text-slate-500 hover:text-slate-200 hover:-translate-y-0.5 active:translate-y-0 transition-all text-2xl flex flex-col items-center justify-center disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+      >
+        <MdRestartAlt />
+        <span className="text-[10px]">リトライ</span>
       </button>
       {/* New Game ボタン */}
       <button

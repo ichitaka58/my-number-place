@@ -144,6 +144,18 @@ export const useSudoku = () => {
   // 履歴（元に戻せる手）があるかどうか
   const canUndo: boolean = history.length > 0;
 
+  /**
+   * ボードを初期状態に戻す
+   */
+  const handleRetryGame = () => {
+    // ボードを初期状態に戻す
+    setMatrix(initialBoard);
+    // メモ数字も初期化する
+    setMemos(createEmptyMemos);
+    setSelectedCell([]); // 選択セルを解除
+    setHistory([]); // 手の履歴もクリアする
+  };
+
   return {
     matrix,
     initialBoard,
@@ -165,5 +177,6 @@ export const useSudoku = () => {
     onClickUndoButton,
     clearHistory,
     canUndo,
+    handleRetryGame
   };
 };
