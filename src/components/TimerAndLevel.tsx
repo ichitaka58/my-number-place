@@ -4,6 +4,7 @@ import type { Level } from "../utils/sudokuLogic";
 import { createResult } from "../lib/api";
 import { FaRegCirclePause } from "react-icons/fa6";
 import { LevelSelectButton } from "./LevelSelectButton";
+import { STORAGE_KEYS } from "../utils/savedGame";
 /**
  * Timerコンポーネントのプロパティ定義
  * @property {boolean} completed - ゲームがクリアされたかどうかを示すフラグ
@@ -50,7 +51,7 @@ export const TimerAndLevel = ({
   // 一時保存ボタンが押されたら、タイマーを保存
   useEffect(() => {
     if (saveButtonClicked) {
-      localStorage.setItem("timer", JSON.stringify(seconds));
+      localStorage.setItem(STORAGE_KEYS.timer, JSON.stringify(seconds));
       setSaveButtonClicked(false);
     }
   }, [saveButtonClicked]);

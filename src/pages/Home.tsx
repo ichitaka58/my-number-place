@@ -21,6 +21,7 @@ import { NUMBERS } from "../utils/sudokuLogic";
 import GameControls from "../components/GameControls";
 import ConfirmNewGameDialog from "../components/ConfirmNewGameDialog";
 import ConfirmSaveGameDialog from "../components/ConfirmSaveGameDialog";
+import { removeSavedGame, STORAGE_KEYS } from "../utils/savedGame";
 
 const Home = () => {
   const {
@@ -57,12 +58,12 @@ const Home = () => {
   // メモモードがオンかオフかを管理するステート
   const [isMemoMode, setIsMemoMode] = useState<boolean>(false);
   // 保存されたゲームがあるかどうかを管理するステート
-  const savedMatrix = localStorage.getItem("currentMatrix");
-  const savedMemos = localStorage.getItem("currentMemos");
-  const savedUserName = localStorage.getItem("userName");
-  const savedTime = localStorage.getItem("timer");
-  const savedInitialBoard = localStorage.getItem("initialBoard");
-  const savedSolvedBoard = localStorage.getItem("solvedBoard");
+  const savedMatrix = localStorage.getItem(STORAGE_KEYS.matrix);
+  const savedMemos = localStorage.getItem(STORAGE_KEYS.memos);
+  const savedUserName = localStorage.getItem(STORAGE_KEYS.userName);
+  const savedTime = localStorage.getItem(STORAGE_KEYS.timer);
+  const savedInitialBoard = localStorage.getItem(STORAGE_KEYS.initialBoard);
+  const savedSolvedBoard = localStorage.getItem(STORAGE_KEYS.solvedBoard);
   const hasSavedGame =
     savedMatrix !== null &&
     savedMemos !== null &&
@@ -70,7 +71,6 @@ const Home = () => {
     savedTime !== null &&
     savedInitialBoard !== null &&
     savedSolvedBoard !== null;
-  // const [hasSavedGame, setHasSavedGame] = useState<boolean>(hasInitSavedData);
   // タイマーを保存するタイミングを伝えるステート
   const [saveButtonClicked, setSaveButtonClicked] = useState<boolean>(false);
   // new gameを始めて良いか確認ダイアログの開閉を管理するステート
@@ -92,12 +92,7 @@ const Home = () => {
    */
   const startGame = () => {
     setGameId(0);
-    localStorage.removeItem("currentMatrix");
-    localStorage.removeItem("currentMemos");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("timer");
-    localStorage.removeItem("initialBoard");
-    localStorage.removeItem("solvedBoard");
+    removeSavedGame();
     // ユーザー名が未入力の場合は、デフォルトで「ゲストユーザー」を設定する
     if (!userName) {
       setUserName("ゲストユーザー");
@@ -126,12 +121,7 @@ const Home = () => {
     handleGenerate();
     setIsRunning(true);
     setGameId((prev) => prev + 1);
-    localStorage.removeItem("currentMatrix");
-    localStorage.removeItem("currentMemos");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("timer");
-    localStorage.removeItem("initialBoard");
-    localStorage.removeItem("solvedBoard");
+    removeSavedGame(); // ローカルストレージのデータを削除
     setSelectedCell([]); // 選択セルを解除
   };
 
@@ -159,13 +149,16 @@ const Home = () => {
   const handleSaveGame = () => {
     setIsRunning(false); // ゲームを停止
     // matrix、memos、userNameをlocalStorageに保存
-    localStorage.setItem("currentMatrix", JSON.stringify(matrix));
+    localStorage.setItem(STORAGE_KEYS.matrix, JSON.stringify(matrix));
     // Setを一度、配列にする
     const arrayMemos = memos.map((r) => r.map((cell) => [...new Set(cell)]));
-    localStorage.setItem("currentMemos", JSON.stringify(arrayMemos));
-    localStorage.setItem("userName", JSON.stringify(userName));
-    localStorage.setItem("initialBoard", JSON.stringify(initialBoard)); // 最初から埋まっていた固定マスも保存
-    localStorage.setItem("solvedBoard", JSON.stringify(solvedBoard)); // 完成盤面も保存
+    localStorage.setItem(STORAGE_KEYS.memos, JSON.stringify(arrayMemos));
+    localStorage.setItem(STORAGE_KEYS.userName, JSON.stringify(userName));
+    localStorage.setItem(
+      STORAGE_KEYS.initialBoard,
+      JSON.stringify(initialBoard),
+    ); // 最初から埋まっていた固定マスも保存
+    localStorage.setItem(STORAGE_KEYS.solvedBoard, JSON.stringify(solvedBoard)); // 完成盤面も保存
     setSaveButtonClicked(true); // 保存ボタンが実行されたことをTimerに伝える
     setSaveGameConfirmOpen(true);
   };
