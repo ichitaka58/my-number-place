@@ -21,6 +21,7 @@ import { NUMBERS } from "../utils/sudokuLogic";
 import GameControls from "../components/GameControls";
 import ConfirmNewGameDialog from "../components/ConfirmNewGameDialog";
 import ConfirmSaveGameDialog from "../components/ConfirmSaveGameDialog";
+import ConfirmRetryGameDialog from "../components/ConfirmRetryGameDialog";
 import { removeSavedGame, STORAGE_KEYS } from "../utils/savedGame";
 
 const Home = () => {
@@ -45,6 +46,7 @@ const Home = () => {
     onClickUndoButton,
     clearHistory,
     canUndo,
+    handleRetryGame,
   } = useSudoku();
   const [windowWidth, windowHeight] = useWindowSize();
   // タイマー（<Timer />）をリセットするための識別用キー（New Gameが押されるたびにカウントアップし秒数を0に戻す）
@@ -77,6 +79,9 @@ const Home = () => {
   const [newGameConfirmOpen, setNewGameConfirmOpen] = useState<boolean>(false);
   // ゲーム保存の確認ダイアログ開閉を管理するステート
   const [saveGameConfirmOpen, setSaveGameConfirmOpen] =
+    useState<boolean>(false);
+  // リトライの確認ダイアログ開閉を管理するステート
+  const [retryGameConfirmOpen, setRetryGameConfirmOpen] =
     useState<boolean>(false);
 
   // 選択されたセルが属するブロック、行、列を特定するためのヘルパー
@@ -134,6 +139,26 @@ const Home = () => {
     } else {
       startNewGame();
     }
+  };
+
+  /**
+   * リトライボタンをクリック時に確認ダイアログを開く処理
+   */
+  const handleRetryClick = () => {
+    setRetryGameConfirmOpen(true);
+    setIsRunning(false);
+  };
+
+  /**
+   * ゲームを最初からやり直すハンドラー関数
+   */
+  const retryGame = () => {
+    // ボード、メモ数字を初期状態に戻す
+    handleRetryGame();
+    setIsMemoMode(false);
+    setIsRunning(true);
+    setGameId((prev) => prev + 1);
+    removeSavedGame();
   };
 
   /**
@@ -363,11 +388,14 @@ const Home = () => {
           )}
         </div>
         {/* Pause Action */}
-        {gameId > 0 && !isRunning && !saveGameConfirmOpen && (
-          <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
-            ⏸️ Pause!
-          </p>
-        )}
+        {gameId > 0 &&
+          !isRunning &&
+          !saveGameConfirmOpen &&
+          !retryGameConfirmOpen && (
+            <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
+              ⏸️ Pause!
+            </p>
+          )}
         {/* Completed Message */}
         {completed && (
           <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-2xl bg-slate-900/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-8 rounded-2xl md:rounded-3xl border border-white/10 absolute top-1/2 left-1/2 animate-slide-up-bounce z-50 whitespace-nowrap shadow-[0_0_50px_rgba(59,130,246,0.3)] pointer-events-none">
@@ -392,6 +420,7 @@ const Home = () => {
           isRunning={isRunning}
           isMemoMode={isMemoMode}
           onToggleMemoMode={onToggleMemoMode}
+          handleRetryClick={handleRetryClick}
           handleNewGameClick={handleNewGameClick}
           onClickSaveButton={handleSaveGame}
           onClickUndoButton={onClickUndoButton}
@@ -417,6 +446,18 @@ const Home = () => {
           setIsStarted(false);
           setUserName("");
           setSaveGameConfirmOpen(false);
+        }}
+      />
+      {/* ゲームやり直しの確認ダイアログ */}
+      <ConfirmRetryGameDialog
+        open={retryGameConfirmOpen}
+        onClose={() => {
+          setRetryGameConfirmOpen(false);
+          setIsRunning(true);
+        }}
+        onConfirm={() => {
+          setRetryGameConfirmOpen(false);
+          retryGame();
         }}
       />
     </div>
