@@ -44,8 +44,7 @@ export const useSudoku = () => {
   const handleGenerate = () => {
     setCompleted(false);
     setSelectedCell([]);
-    setHistory([]); // 手の履歴をクリアする
-    setRedoHistory([]); // redoの履歴をクリアする
+    clearHistory(); // 手の履歴、redoの履歴もクリアする
     // 選択した問題のレベルに応じて、盤面から消すマスの数を決定する
     const blanks = selectLevel(level);
     // 完成盤面を生成する
@@ -183,8 +182,7 @@ export const useSudoku = () => {
     // メモ数字も初期化する
     setMemos(createEmptyMemos);
     setSelectedCell([]); // 選択セルを解除
-    setHistory([]); // 手の履歴もクリアする
-    setRedoHistory([]); // redoの履歴もクリアする
+    clearHistory(); // 手の履歴、redoの履歴もクリアする
   };
 
   return {
