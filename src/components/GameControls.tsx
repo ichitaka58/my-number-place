@@ -2,7 +2,7 @@ import { CiEraser } from "react-icons/ci";
 import { LuSquarePen } from "react-icons/lu";
 import { MdSaveAlt, MdRestartAlt } from "react-icons/md";
 import { VscNewFile } from "react-icons/vsc";
-import { FaUndo } from "react-icons/fa";
+import { FaRedo, FaUndo } from "react-icons/fa";
 
 type GameControlsProps = {
   onClickCancelButton: () => void;
@@ -14,7 +14,9 @@ type GameControlsProps = {
   handleNewGameClick: () => void;
   onClickSaveButton: () => void;
   onClickUndoButton: () => void;
+  onClickRedoButton: () => void;
   canUndo: boolean;
+  canRedo: boolean;
 };
 
 const GameControls = ({
@@ -27,7 +29,9 @@ const GameControls = ({
   handleNewGameClick,
   onClickSaveButton,
   onClickUndoButton,
+  onClickRedoButton,
   canUndo,
+  canRedo,
 }: GameControlsProps) => {
   return (
     <div className="flex justify-center mt-2 gap-10">
@@ -48,6 +52,15 @@ const GameControls = ({
       >
         <FaUndo />
         <span className="text-[11px]">元に戻す</span>
+      </button>
+      {/* redoボタン */}
+      <button
+        onClick={onClickRedoButton}
+        disabled={completed || !isRunning || !canRedo}
+        className="cursor-pointer hover:scale-105 text-slate-500 hover:text-slate-200 hover:-translate-y-0.5 active:translate-y-0 transition-all text-2xl flex flex-col items-center justify-center disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+      >
+        <FaRedo />
+        <span className="text-[11px]">やり直す</span>
       </button>
       {/* メモボタン */}
       <button

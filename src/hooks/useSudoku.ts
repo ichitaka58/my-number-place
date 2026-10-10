@@ -34,13 +34,17 @@ export const useSudoku = () => {
   const [history, setHistory] = useState<
     { matrix: number[][]; memos: Set<number>[][] }[]
   >([]);
+  // redo用(やり直し用)履歴を管理するステート
+  const [redoHistory, setRedoHistory] = useState<
+    { matrix: number[][]; memos: Set<number>[][] }[]
+  >([]);
 
   // 「生成」ボタンがクリックされたときの処理
   // 新しい盤面を生成し、ステートを更新してUIを再レンダリングする
   const handleGenerate = () => {
     setCompleted(false);
     setSelectedCell([]);
-    setHistory([]); // 手の履歴をクリアする
+    clearHistory(); // 手の履歴、redoの履歴もクリアする
     // 選択した問題のレベルに応じて、盤面から消すマスの数を決定する
     const blanks = selectLevel(level);
     // 完成盤面を生成する
@@ -71,6 +75,8 @@ export const useSudoku = () => {
       if (matrix[selectedRow][selectedCol] === value) return;
       // 今の状態のmatrix、memosを履歴に保存する
       setHistory((prev) => [...prev, { matrix, memos }]);
+      // redoのスタックを空にする
+      setRedoHistory([]);
       const newMatrix = matrix.map((row) => [...row]); // 盤面ステートをコピー
       newMatrix[selectedRow][selectedCol] = value; // 選択したマスに取得した数字を入れる
       setMatrix(newMatrix);
@@ -97,6 +103,8 @@ export const useSudoku = () => {
     if (selectedCell.length === 2) {
       if (matrix[selectedCell[0]][selectedCell[1]] === 0) return;
       setHistory((prev) => [...prev, { matrix, memos }]);
+      // redoのスタックを空にする
+      setRedoHistory([]);
       const newMatrix = matrix.map((row) => [...row]);
       newMatrix[selectedCell[0]][selectedCell[1]] = 0;
       setMatrix(newMatrix);
@@ -112,6 +120,8 @@ export const useSudoku = () => {
       const selectedCol: number = selectedCell[1]; // 選択したセルの列インデックス
       if (matrix[selectedRow][selectedCol] !== 0) return;
       setHistory((prev) => [...prev, { matrix, memos }]);
+      // redoのスタックを空にする
+      setRedoHistory([]);
       const value = Number(e.currentTarget.innerText);
       const newMemos = memos.map((row) => row.map((cell) => new Set(cell)));
       const cellMemos = newMemos[selectedRow][selectedCol];
@@ -125,10 +135,11 @@ export const useSudoku = () => {
   };
 
   /**
-   * 手を元に戻す
+   * 手を元に戻す（undo）
    */
   const onClickUndoButton = () => {
     if (history.length === 0) return;
+    setRedoHistory((prev) => [...prev, { matrix, memos }]);
     const last = history[history.length - 1];
     setMatrix(last.matrix);
     setMemos(last.memos);
@@ -136,13 +147,31 @@ export const useSudoku = () => {
   };
 
   /**
-   * 手の履歴をクリアする関数
+   * 手をやり直す（redo）
+   */
+  const onClickRedoButton = () => {
+    if (redoHistory.length === 0) return;
+    setHistory((prev) => [...prev, { matrix, memos }]);
+    const next = redoHistory[redoHistory.length - 1];
+    setMatrix(next.matrix);
+    setMemos(next.memos);
+    setRedoHistory((prev) => prev.slice(0, -1));
+  };
+
+  /**
+   * 手の履歴、redoの履歴をクリアする関数
    * @returns void;
    */
-  const clearHistory = () => setHistory([]);
+  const clearHistory = () => {
+    setHistory([]);
+    setRedoHistory([]);
+  };
 
   // 履歴（元に戻せる手）があるかどうか
   const canUndo: boolean = history.length > 0;
+
+  // 履歴（やり直せる手）があるかどうか
+  const canRedo: boolean = redoHistory.length > 0;
 
   /**
    * ボードを初期状態に戻す
@@ -153,7 +182,7 @@ export const useSudoku = () => {
     // メモ数字も初期化する
     setMemos(createEmptyMemos);
     setSelectedCell([]); // 選択セルを解除
-    setHistory([]); // 手の履歴もクリアする
+    clearHistory(); // 手の履歴、redoの履歴もクリアする
   };
 
   return {
@@ -175,8 +204,10 @@ export const useSudoku = () => {
     onClickCancelButton,
     onClickMemoNumber,
     onClickUndoButton,
+    onClickRedoButton,
     clearHistory,
     canUndo,
-    handleRetryGame
+    canRedo,
+    handleRetryGame,
   };
 };

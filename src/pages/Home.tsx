@@ -44,8 +44,10 @@ const Home = () => {
     onClickCancelButton,
     onClickMemoNumber,
     onClickUndoButton,
+    onClickRedoButton,
     clearHistory,
     canUndo,
+    canRedo,
     handleRetryGame,
   } = useSudoku();
   const [windowWidth, windowHeight] = useWindowSize();
@@ -200,7 +202,7 @@ const Home = () => {
       savedInitialBoard &&
       savedSolvedBoard
     ) {
-      clearHistory(); // 手の履歴をクリア
+      clearHistory(); // 手の履歴、redoの履歴をクリア
       setMatrix(JSON.parse(savedMatrix));
       const parsedSavedMemos: number[][][] = JSON.parse(savedMemos);
       setMemos(parsedSavedMemos.map((r) => r.map((cell) => new Set(cell))));
@@ -424,7 +426,9 @@ const Home = () => {
           handleNewGameClick={handleNewGameClick}
           onClickSaveButton={handleSaveGame}
           onClickUndoButton={onClickUndoButton}
+          onClickRedoButton={onClickRedoButton}
           canUndo={canUndo}
+          canRedo={canRedo}
         />
       </div>
 
